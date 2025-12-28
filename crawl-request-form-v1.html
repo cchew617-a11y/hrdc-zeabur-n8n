@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jason Chew's AI Classroom - Secure Scraper</title>
+    <title>Jason Chew's AI Classroom - Secure Scraper [v1]</title>
     <style>
         :root { --primary: #ff6d5a; --accent: #4dabf7; --dark: #333; --success: #0ca678; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; padding: 40px 20px; background: #f0f2f5; color: var(--dark); }
@@ -34,40 +34,45 @@
 
         /* Footer */
         .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
-        .admin-email { font-size: 0.9rem; font-weight: bold; color: var(--dark); margin-bottom: 5px; }
-        .disclaimer { font-size: 0.75rem; color: #999; line-height: 1.4; }
+        .admin-email { font-size: 0.9rem; font-weight: bold; color: var(--dark); margin-bottom: 10px; }
+        
+        /* Disclaimer Styling */
+        .disclaimer-box { background: #f8f9fa; padding: 12px; border-radius: 6px; border: 1px solid #eee; }
+        .disclaimer-text { font-size: 0.72rem; color: #777; line-height: 1.5; text-align: justify; }
+        .disclaimer-bold { color: #555; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <!-- (1) Company Name & Logo -->
         <div class="header">
-            <img src="jasonchew.aitrainerlogo.png" alt="Logo" class="logo" onerror="this.src='https://via.placeholder.com/80?text=AI'">
+            <img src="logo.jpg" alt="Logo" class="logo" onerror="this.src='https://via.placeholder.com/80?text=AI'">
             <div class="company-name">Jason Chew's AI Classroom</div>
         </div>
 
-        <h3>Secure Scraper (v1)</h3>
+        <h3>Secure Scraper (v2)</h3>
         <p>Convert any sitemap into a structured AI Knowledge Base delivered to your inbox.</p>
         
-        <label for="sitemapUrl">Sitemap URL [sample: https://site.com/sitemap.xml] </label>
+        <label for="sitemapUrl">Sitemap URL   [sample: https://site.com/sitemap.xml]</label>
         <input type="url" id="sitemapUrl" placeholder="https://site.com/sitemap.xml" required>
 
         <label for="userEmail">Delivery Email</label>
         <input type="email" id="userEmail" placeholder="your@email.com" required>
 
-        <!-- (2) Start Scraper Button -->
         <button id="scrapeBtn" class="btn" onclick="sendData()">Start Scrape & Email Me</button>
 
-        <!-- (3) Notification Message -->
         <div id="status"></div>
 
         <div class="footer">
-            <!-- (4) Admin Email -->
             <div class="admin-email">JasonChew.HRDCtrainer@gmail.com</div>
-            <!-- (5) Disclaimer -->
-            <div class="disclaimer">
-                <b>Privacy Note:</b> Your data is private. Results are generated as individual Google Docs and emailed only to the address provided. System clears cache every 24 hours.
+            
+            <!-- Legal Disclaimer Box -->
+            <div class="disclaimer-box">
+                <div class="disclaimer-text">
+                    <span class="disclaimer-bold">Legal Disclaimer:</span> This tool is provided for educational and administrative convenience. Users are <span class="disclaimer-bold">solely responsible</span> for ensuring that their use of this scraper does not breach the copyright, intellectual property rights, or Terms of Service of the target website. 
+                    <br><br>
+                    <span class="disclaimer-bold">Jason Chew's AI Classroom</span> (App Owner) assumes no liability for any copyright infringements, unauthorized data usage, or legal consequences arising from the actions of the user.
+                </div>
             </div>
         </div>
     </div>
@@ -79,16 +84,15 @@
             const status = document.getElementById('status');
             const btn = document.getElementById('scrapeBtn');
             
-            // Replace with your n8n Production Webhook URL
+            // USE YOUR PRODUCTION WEBHOOK URL HERE
             const webhookUrl = 'https://n8ncchew617.zeabur.app/webhook/crawl-request';
 
             if (!urlInput.value || !emailInput.value) {
-                return alert('Please fill in both the Sitemap URL and your Email.');
+                return alert('Please fill in both fields.');
             }
 
-            // UI Feedback
             status.className = ""; 
-            status.innerText = "⏳ Sending request to AI engine...";
+            status.innerText = "⏳ Processing request...";
             status.style.display = "block";
             btn.disabled = true;
             
@@ -104,14 +108,14 @@
 
                 if (response.ok) {
                     status.className = "success";
-                    status.innerHTML = `<b>✔ Request Successful!</b><br><br>The AI is now crawling the site. Since this processes multiple pages, it usually takes <b>3 to 5 minutes</b>. Please check your inbox (<b>${emailInput.value}</b>) shortly for the links!`;
-                    urlInput.value = ""; // Clear input on success
+                    status.innerHTML = `<b>✔ Request Successful!</b><br><br>The AI is now processing. Please check <b>${emailInput.value}</b> in about 3-5 minutes for your secure links.`;
+                    urlInput.value = "";
                 } else {
-                    throw new Error("Server error " + response.status);
+                    throw new Error();
                 }
             } catch (error) {
                 status.className = "error";
-                status.innerText = "✖ Failure: System offline. Please contact the administrator.";
+                status.innerText = "✖ System Offline: Please try again later or contact the admin.";
             } finally {
                 btn.disabled = false;
             }
