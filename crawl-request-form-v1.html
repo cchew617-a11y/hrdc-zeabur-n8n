@@ -7,85 +7,53 @@
     <style>
         :root { --primary: #ff6d5a; --accent: #4dabf7; --dark: #333; --success: #0ca678; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; padding: 40px 20px; background: #f0f2f5; color: var(--dark); }
-        
         .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 450px; text-align: center; }
-        
-        /* Logo & Header */
         .header { margin-bottom: 25px; }
-        .logo { 
-            width: 80px; 
-            height: 80px; 
-            border-radius: 50%; 
-            border: 3px solid var(--primary); 
-            margin-bottom: 10px; 
-            object-fit: cover;
-            display: inline-block;
-        }
+        .logo { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 10px; object-fit: cover; display: inline-block; }
         .company-name { font-size: 1.4rem; font-weight: bold; color: var(--dark); margin: 0; }
-
-        /* Form Elements */
         p { font-size: 0.95rem; color: #666; margin-bottom: 20px; }
         label { display: block; text-align: left; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: #555; }
         input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 1rem; transition: border 0.3s; }
         input:focus { border-color: var(--primary); outline: none; }
-
-        /* Button */
         .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1rem; transition: all 0.2s; color: white; background: var(--primary); }
         .btn:hover { opacity: 0.9; }
         .btn:active { transform: scale(0.98); }
         .btn:disabled { background: #ccc; cursor: not-allowed; }
-
-        /* Notifications */
         #status { font-size: 0.9rem; padding: 15px; border-radius: 8px; margin-top: 20px; display: none; line-height: 1.4; }
         .success { display: block !important; background: #e6fcf5; color: var(--success); border: 1px solid #b2f2bb; text-align: left; }
-        .error { display: block !important; background: #fff5f5; color: #fa5252; border: 1px solid #ffc9c9; }
-
-        /* Footer */
+        .error { display: block !important; background: #fff5f5; color: #fa5252; border: 1px solid #ffc9c9; text-align: left; }
         .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
         .admin-email { font-size: 0.9rem; font-weight: bold; color: var(--dark); margin-bottom: 10px; }
-        
-        /* Disclaimer Styling */
         .disclaimer-box { background: #f8f9fa; padding: 12px; border-radius: 6px; border: 1px solid #eee; }
         .disclaimer-text { font-size: 0.72rem; color: #777; line-height: 1.5; text-align: justify; }
         .disclaimer-bold { color: #555; font-weight: bold; }
     </style>
 </head>
 <body>
-
     <div class="card">
         <div class="header">
-            <!-- Added width/height for mobile loading stability -->
-            <img src="jasonchew.aitrainerlogo.png" 
-                 alt="Logo" 
-                 class="logo" 
-                 width="80" 
-                 height="80"
-                 onerror="this.src='https://via.placeholder.com/80?text=AI'">
+            <img src="jasonchew.aitrainerlogo.png" alt="Logo" class="logo" width="80" height="80" onerror="this.src='https://via.placeholder.com/80?text=AI'">
             <div class="company-name">Jason Chew's AI Classroom</div>
         </div>
-
         <h3>Secure Scraper (v1)</h3>
         <p>Enter a domain to generate a structured AI Business Analysis delivered to your inbox.</p>
         
-        <label for="domainInput">Website Domain [example: sitename.com]</label>
+        <label for="domainInput">Website Domain [example: site.com]</label>
         <input type="text" id="domainInput" placeholder="example.com" required>
 
         <label for="userEmail">Delivery Email</label>
         <input type="email" id="userEmail" placeholder="your@email.com" required>
 
         <button id="scrapeBtn" class="btn" onclick="sendData()">Start Scrape & Email Me</button>
-
         <div id="status"></div>
 
         <div class="footer">
             <div class="admin-email">cchew617@gmail.com</div>
-            
-            <!-- Legal Disclaimer Box -->
             <div class="disclaimer-box">
                 <div class="disclaimer-text">
                     <span class="disclaimer-bold">Legal Disclaimer:</span> This tool is provided for educational and administrative convenience. Users are <span class="disclaimer-bold">solely responsible</span> for ensuring that their use of this scraper does not breach the copyright, intellectual property rights, or Terms of Service of the target website. 
                     <br><br>
-                    <span class="disclaimer-bold">Jason Chew's AI Classroom</span> (App Owner) assumes no liability for any copyright infringements, unauthorized data usage, or legal consequences arising from the actions of the user.
+                    <span class="disclaimer-bold">Jason Chew's AI Classroom</span> (App Owner) assumes no liability for any consequences arising from the actions of the user.
                 </div>
             </div>
         </div>
@@ -97,25 +65,18 @@
             const emailInput = document.getElementById('userEmail');
             const status = document.getElementById('status');
             const btn = document.getElementById('scrapeBtn');
-            
             const webhookUrl = 'https://n8ncchew617.zeabur.app/webhook/crawl-request';
 
-            if (!domainField.value || !emailInput.value) {
-                return alert('Please fill in both fields.');
-            }
+            if (!domainField.value || !emailInput.value) return alert('Please fill in both fields.');
 
-            // --- URL NORMALIZATION LOGIC ---
+            // URL Normalization Logic
             let rawDomain = domainField.value.trim().toLowerCase();
-            
-            // 1. Remove http://, https:// and any trailing slashes
             let cleanDomain = rawDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
-            
-            // 2. Build the final sitemap path
             const finalSitemapUrl = `https://${cleanDomain}/sitemap.xml`;
-            // -------------------------------
 
+            // Reset UI
             status.className = ""; 
-            status.innerText = "⏳ Processing request...";
+            status.innerText = "🔍 Checking website sitemap...";
             status.style.display = "block";
             btn.disabled = true;
             
@@ -123,22 +84,24 @@
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        sitemapUrl: finalSitemapUrl, 
-                        userEmail: emailInput.value 
-                    })
+                    body: JSON.stringify({ sitemapUrl: finalSitemapUrl, userEmail: emailInput.value })
                 });
+
+                // Get the message we wrote in n8n (Respond to Webhook node)
+                const resultText = await response.text();
 
                 if (response.ok) {
                     status.className = "success";
-                    status.innerHTML = `<b>✔ Request Successful!</b><br><br>Crawl target: <i>${finalSitemapUrl}</i><br><br>The AI is now processing. Please check <b>${emailInput.value}</b> in about 3-5 minutes for your secure link.`;
+                    status.innerHTML = `<b>✔ Success!</b><br><br>${resultText}`;
                     domainField.value = "";
                 } else {
-                    throw new Error();
+                    // This triggers if n8n returns Status 400 (The "Error" response)
+                    status.className = "error";
+                    status.innerHTML = `<b>✖ Failed:</b><br><br>${resultText}`;
                 }
             } catch (error) {
                 status.className = "error";
-                status.innerText = "✖ System Offline: Please try again later or contact the admin.";
+                status.innerText = "✖ System Offline: Could not reach the server.";
             } finally {
                 btn.disabled = false;
             }
