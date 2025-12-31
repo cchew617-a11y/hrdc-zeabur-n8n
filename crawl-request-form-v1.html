@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jason Chew's AI Classroom - Secure Scraper [v1]</title>
+    <title>Jason Chew's AI Classroom - Secure Scraper</title>
     <style>
         :root { --primary: #ff6d5a; --accent: #4dabf7; --dark: #333; --success: #0ca678; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; padding: 40px 20px; background: #f0f2f5; color: var(--dark); }
@@ -12,7 +12,15 @@
         
         /* Logo & Header */
         .header { margin-bottom: 25px; }
-        .logo { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 10px; object-fit: cover; }
+        .logo { 
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%; 
+            border: 3px solid var(--primary); 
+            margin-bottom: 10px; 
+            object-fit: cover;
+            display: inline-block;
+        }
         .company-name { font-size: 1.4rem; font-weight: bold; color: var(--dark); margin: 0; }
 
         /* Form Elements */
@@ -46,15 +54,21 @@
 
     <div class="card">
         <div class="header">
-            <img src="jasonchew.aitrainerlogo.png" alt="Logo" class="logo" onerror="this.src='https://via.placeholder.com/80?text=AI'">
+            <!-- Added width/height for mobile loading stability -->
+            <img src="jasonchew.aitrainerlogo.png" 
+                 alt="Logo" 
+                 class="logo" 
+                 width="80" 
+                 height="80"
+                 onerror="this.src='https://via.placeholder.com/80?text=AI'">
             <div class="company-name">Jason Chew's AI Classroom</div>
         </div>
 
         <h3>Secure Scraper (v1)</h3>
-        <p>Convert any sitemap into a structured AI Knowledge Base delivered to your inbox.</p>
+        <p>Enter a domain to generate a structured AI Business Analysis delivered to your inbox.</p>
         
-        <label for="sitemapUrl">Sitemap URL   [sample: https://site.com/sitemap.xml]</label>
-        <input type="url" id="sitemapUrl" placeholder="https://site.com/sitemap.xml" required>
+        <label for="domainInput">Website Domain [example: sitename.com]</label>
+        <input type="text" id="domainInput" placeholder="example.com" required>
 
         <label for="userEmail">Delivery Email</label>
         <input type="email" id="userEmail" placeholder="your@email.com" required>
@@ -79,17 +93,26 @@
 
     <script>
         async function sendData() {
-            const urlInput = document.getElementById('sitemapUrl');
+            const domainField = document.getElementById('domainInput');
             const emailInput = document.getElementById('userEmail');
             const status = document.getElementById('status');
             const btn = document.getElementById('scrapeBtn');
             
-            // USE YOUR PRODUCTION WEBHOOK URL HERE
             const webhookUrl = 'https://n8ncchew617.zeabur.app/webhook/crawl-request';
 
-            if (!urlInput.value || !emailInput.value) {
+            if (!domainField.value || !emailInput.value) {
                 return alert('Please fill in both fields.');
             }
+
+            // --- URL NORMALIZATION LOGIC ---
+            let rawDomain = domainField.value.trim().toLowerCase();
+            
+            // 1. Remove http://, https:// and any trailing slashes
+            let cleanDomain = rawDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+            
+            // 2. Build the final sitemap path
+            const finalSitemapUrl = `https://${cleanDomain}/sitemap.xml`;
+            // -------------------------------
 
             status.className = ""; 
             status.innerText = "⏳ Processing request...";
@@ -101,15 +124,15 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        sitemapUrl: urlInput.value,
+                        sitemapUrl: finalSitemapUrl, 
                         userEmail: emailInput.value 
                     })
                 });
 
                 if (response.ok) {
                     status.className = "success";
-                    status.innerHTML = `<b>✔ Request Successful!</b><br><br>The AI is now processing. Please check <b>${emailInput.value}</b> in about 3-5 minutes for your secure links.`;
-                    urlInput.value = "";
+                    status.innerHTML = `<b>✔ Request Successful!</b><br><br>Crawl target: <i>${finalSitemapUrl}</i><br><br>The AI is now processing. Please check <b>${emailInput.value}</b> in about 3-5 minutes for your secure link.`;
+                    domainField.value = "";
                 } else {
                     throw new Error();
                 }
