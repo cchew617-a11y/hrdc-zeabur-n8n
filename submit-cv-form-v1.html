@@ -13,11 +13,11 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px; /* Added padding for mobile screens */
+            padding: 20px;
         }
         .card {
             background: white;
-            padding: 2.5rem; /* Increased padding slightly */
+            padding: 2.5rem;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
@@ -30,35 +30,15 @@
             border-radius: 50%;
             margin-bottom: 1rem;
             object-fit: cover;
-            border: 2px solid #e5e7eb; /* Optional: adds a subtle ring to logo */
+            border: 2px solid #e5e7eb;
         }
-        h2 { 
-            margin: 0 0 0.5rem 0; 
-            color: #111827; 
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        h3 { 
-            margin: 0 0 0.5rem 0; 
-            color: #111827; /* Darker black for the subtitle */
-            font-weight: 700; /* Bold subtitle */
-            font-size: 1.25rem; 
-        }
-        .description {
-            color: #6b7280; /* Light grey description */
-            margin: 0 0 2rem 0;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-        label { 
-            display: block; 
-            text-align: left; 
-            margin-bottom: 0.5rem; 
-            font-weight: 600; 
-            color: #374151; 
-            font-size: 0.9rem;
-        }
-        input[type="text"], input[type="file"] {
+        h2 { margin: 0 0 0.5rem 0; color: #111827; font-size: 1.5rem; font-weight: 700; }
+        h3 { margin: 0 0 0.5rem 0; color: #111827; font-weight: 700; font-size: 1.25rem; }
+        .description { color: #6b7280; margin: 0 0 2rem 0; font-size: 0.95rem; line-height: 1.5; }
+        label { display: block; text-align: left; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.9rem; }
+        
+        /* Updated Styles for Select Dropdown */
+        select, input[type="file"] {
             width: 100%;
             padding: 0.75rem;
             margin-bottom: 1.5rem;
@@ -67,12 +47,12 @@
             box-sizing: border-box;
             font-size: 1rem;
             color: #4b5563;
+            background-color: white;
+            cursor: pointer;
         }
-        /* Style for the file input text */
-        input[type="file"] {
-            padding: 0.5rem;
-            background: #fff;
-        }
+
+        input[type="file"] { padding: 0.5rem; }
+        
         button {
             width: 100%;
             padding: 0.85rem;
@@ -89,48 +69,40 @@
         }
         button:hover { background-color: #e55a3b; }
         
-        /* Footer Styling */
-        .footer-email {
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 0.75rem;
-            display: block;
-            font-size: 0.9rem;
-        }
+        .footer-email { font-weight: 700; color: #111827; margin-bottom: 0.75rem; display: block; font-size: 0.9rem; }
         .legal-box {
-            background-color: #f9fafb; /* Light grey background */
+            background-color: #f9fafb;
             border: 1px solid #f3f4f6;
             border-radius: 8px;
             padding: 1rem;
-            text-align: left; /* Left indented text */
+            text-align: left;
             font-size: 0.75rem;
             color: #6b7280;
             line-height: 1.4;
         }
-        .legal-box strong {
-            color: #4b5563;
-        }
+        .legal-box strong { color: #4b5563; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <!-- Replace with your specific logo URL -->
         <img src="jasonchew.aitrainerlogo.png" alt="Logo" class="logo">
         
         <h2>Jason Chew's AI Classroom</h2>
-        <h3>Candidate Application</h3>
+        <h3>Candidate Application [v1] </h3>
         
-        <!-- Added Description Text in Light Grey -->
         <p class="description">
-            Please enter the Job Reference Code provided by the recruiter and upload your CV (PDF format) to begin the AI evaluation process.
+            Select the position you are applying for and upload your CV to begin.
         </p>
 
-        <!-- IMPORTANT: Update 'action' with your Webhook URL -->
-        <form action="https://n8ncchew617.zeabur.app/webhook-test/submit-cv" method="POST" enctype="multipart/form-data">
+        <!-- Main Form (Submits to your Workflow) -->
+        <form action="https://n8ncchew617.zeabur.app/webhook/submit-cv" method="POST" enctype="multipart/form-data">
             
-            <label for="job_id">Job Reference Code</label>
-            <input type="text" id="job_id" name="job_id" placeholder="e.g. JOB-001" required>
+            <label for="job_id">Select Position</label>
+            <!-- Dropdown List -->
+            <select id="job_id" name="job_id" required>
+                <option value="" disabled selected>Loading jobs...</option>
+            </select>
 
             <label for="cv_file">Upload CV (PDF)</label>
             <input type="file" id="cv_file" name="data" accept=".pdf,.doc,.docx" required>
@@ -138,17 +110,54 @@
             <button type="submit">Submit Application</button>
         </form>
 
-        <!-- Footer Section -->
         <div class="footer-section">
             <span class="footer-email">cchew617@gmail.com</span>
-            
             <div class="legal-box">
-                <strong>Legal Disclaimer:</strong> This tool is provided for educational and administrative convenience. Users are <strong>solely responsible</strong> for ensuring that their use of this automation does not breach data privacy laws or terms of service.
-                <br><br>
-                Jason Chew's AI Classroom (App Owner) assumes no liability for any consequences arising from the actions of the user.
+                <strong>Legal Disclaimer:</strong> Users are <strong>solely responsible</strong> for ensuring that their use of this automation does not breach data privacy laws.
             </div>
         </div>
     </div>
+
+    <!-- JAVASCRIPT TO FETCH JOBS -->
+    <script>
+        // ---------------------------------------------------------
+        // CONFIGURATION: PASTE YOUR 'GET JOBS' WEBHOOK URL HERE
+        // ---------------------------------------------------------
+        const GET_JOBS_URL = "YOUR_GET_JOBS_WEBHOOK_URL_HERE"; 
+
+        async function loadJobs() {
+            const dropdown = document.getElementById("job_id");
+            try {
+                const response = await fetch(GET_JOBS_URL);
+                const data = await response.json();
+                
+                // Clear the "Loading..." text
+                dropdown.innerHTML = '<option value="" disabled selected>-- Select a Job --</option>';
+
+                // Loop through the data from Google Sheets
+                data.forEach(row => {
+                    // Check your Google Sheet Column Names here! 
+                    // Based on your screenshot, they are "Job ID" and "Job Position"
+                    const id = row["Job ID"];
+                    const title = row["Job Position"]; // I recommend using Position instead of Description
+
+                    if(id && title) {
+                        const option = document.createElement("option");
+                        option.value = id; // This is sent to n8n (e.g., JOB-001)
+                        option.text = `${id} - ${title}`; // This is what the user sees
+                        dropdown.appendChild(option);
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error fetching jobs:", error);
+                dropdown.innerHTML = '<option value="" disabled>Error loading jobs</option>';
+            }
+        }
+
+        // Run the function when page opens
+        loadJobs();
+    </script>
 
 </body>
 </html>
