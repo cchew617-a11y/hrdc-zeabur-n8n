@@ -121,7 +121,7 @@
     <!-- JAVASCRIPT TO FETCH JOBS -->
     <script>
         // ---------------------------------------------------------
-        // CONFIGURATION: PASTE YOUR 'GET JOBS' WEBHOOK URL HERE
+        // CONFIGURATION: Ensure this matches your n8n Production URL
         // ---------------------------------------------------------
         const GET_JOBS_URL = "https://n8ncchew617.zeabur.app/webhook/get-jobs"; 
 
@@ -131,33 +131,44 @@
                 const response = await fetch(GET_JOBS_URL);
                 const data = await response.json();
                 
+                // --- DEBUGGING: Open Console (F12) to see this ---
+                console.log("Data received from n8n:", data);
+                
+                // Check if n8n returned an error message (like "Workflow not active")
+                if (data.message) {
+                    console.error("n8n Error:", data.message);
+                    dropdown.innerHTML = '<option value="" disabled>Error: ' + data.message + '</option>';
+                    return;
+                }
+
+                // SAFETY: Ensure 'data' is a list. If it's a single object, wrap it in brackets [ ].
+                const jobList = Array.isArray(data) ? data : [data];
+
                 // Clear the "Loading..." text
                 dropdown.innerHTML = '<option value="" disabled selected>-- Select a Job --</option>';
 
-                // Loop through the data from Google Sheets
-                data.forEach(row => {
-                    // Check your Google Sheet Column Names here! 
-                    // Based on your screenshot, they are "Job ID" and "Job Position"
+                // Loop through the data
+                jobList.forEach(row => {
+                    // Ensure we are reading the correct columns from your Google Sheet
                     const id = row["Job ID"];
-                    const title = row["Job Position"]; // I recommend using Position instead of Description
+                    const title = row["Job Position"]; 
 
                     if(id && title) {
                         const option = document.createElement("option");
-                        option.value = id; // This is sent to n8n (e.g., JOB-001)
-                        option.text = `${id} - ${title}`; // This is what the user sees
+                        option.value = id; 
+                        option.text = `${id} - ${title}`; 
                         dropdown.appendChild(option);
                     }
                 });
 
             } catch (error) {
                 console.error("Error fetching jobs:", error);
-                dropdown.innerHTML = '<option value="" disabled>Error loading jobs</option>';
+                dropdown.innerHTML = '<option value="" disabled>Connection Failed (Check Console)</option>';
             }
         }
 
         // Run the function when page opens
         loadJobs();
     </script>
-
 </body>
 </html>
