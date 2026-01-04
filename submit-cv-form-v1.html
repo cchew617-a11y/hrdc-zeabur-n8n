@@ -96,6 +96,7 @@
         </p>
 
         <!-- Main Form (Submits to your Workflow) -->
+        <!-- Note: This URL must point to your SUBMIT-CV webhook (POST method) -->
         <form action="https://n8ncchew617.zeabur.app/webhook/submit-cv" method="POST" enctype="multipart/form-data">
             
             <label for="job_id">Select Position</label>
@@ -121,7 +122,7 @@
     <!-- JAVASCRIPT TO FETCH JOBS -->
     <script>
         // ---------------------------------------------------------
-        // CONFIGURATION: Ensure this matches your n8n Production URL
+        // CONFIGURATION: Points to the 'GET JOBS' Webhook (GET method)
         // ---------------------------------------------------------
         const GET_JOBS_URL = "https://n8ncchew617.zeabur.app/webhook/get-jobs"; 
 
@@ -134,7 +135,7 @@
                 // --- DEBUGGING: Open Console (F12) to see this ---
                 console.log("Data received from n8n:", data);
                 
-                // Check if n8n returned an error message (like "Workflow not active")
+                // Check if n8n returned an error message
                 if (data.message) {
                     console.error("n8n Error:", data.message);
                     dropdown.innerHTML = '<option value="" disabled>Error: ' + data.message + '</option>';
@@ -152,11 +153,19 @@
                     // Ensure we are reading the correct columns from your Google Sheet
                     const id = row["Job ID"];
                     const title = row["Job Position"]; 
+                    const company = row["Company Name"]; // Added Company Name
 
                     if(id && title) {
                         const option = document.createElement("option");
                         option.value = id; 
-                        option.text = `${id} - ${title}`; 
+                        
+                        // Display Format: JOB-001 - Company Name - Job Position
+                        if (company) {
+                            option.text = `${id} - ${company} - ${title}`; 
+                        } else {
+                            option.text = `${id} - ${title}`;
+                        }
+                        
                         dropdown.appendChild(option);
                     }
                 });
@@ -170,5 +179,6 @@
         // Run the function when page opens
         loadJobs();
     </script>
+
 </body>
 </html>
