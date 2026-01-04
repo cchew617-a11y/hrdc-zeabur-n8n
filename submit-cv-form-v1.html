@@ -11,16 +11,17 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px; /* Added padding for mobile screens */
         }
         .card {
             background: white;
-            padding: 2rem;
+            padding: 2.5rem; /* Increased padding slightly */
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
         }
         .logo {
@@ -29,66 +30,122 @@
             border-radius: 50%;
             margin-bottom: 1rem;
             object-fit: cover;
+            border: 2px solid #e5e7eb; /* Optional: adds a subtle ring to logo */
         }
-        h2 { margin: 0 0 0.5rem 0; color: #111827; }
-        h3 { margin: 0 0 1.5rem 0; color: #4b5563; font-weight: 500; font-size: 1.1rem; }
-        label { display: block; text-align: left; margin-bottom: 0.5rem; font-weight: 600; color: #374151; }
+        h2 { 
+            margin: 0 0 0.5rem 0; 
+            color: #111827; 
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        h3 { 
+            margin: 0 0 0.5rem 0; 
+            color: #111827; /* Darker black for the subtitle */
+            font-weight: 700; /* Bold subtitle */
+            font-size: 1.25rem; 
+        }
+        .description {
+            color: #6b7280; /* Light grey description */
+            margin: 0 0 2rem 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        label { 
+            display: block; 
+            text-align: left; 
+            margin-bottom: 0.5rem; 
+            font-weight: 600; 
+            color: #374151; 
+            font-size: 0.9rem;
+        }
         input[type="text"], input[type="file"] {
             width: 100%;
             padding: 0.75rem;
             margin-bottom: 1.5rem;
             border: 1px solid #d1d5db;
             border-radius: 6px;
-            box-sizing: border-box; /* Ensures padding doesn't widen the box */
+            box-sizing: border-box;
+            font-size: 1rem;
+            color: #4b5563;
+        }
+        /* Style for the file input text */
+        input[type="file"] {
+            padding: 0.5rem;
+            background: #fff;
         }
         button {
             width: 100%;
-            padding: 0.75rem;
-            background-color: #ff6b4a; /* The orange color from your image */
+            padding: 0.85rem;
+            background-color: #ff6b4a; 
             color: white;
             border: none;
             border-radius: 6px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: background-color 0.2s;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(255, 107, 74, 0.2);
         }
         button:hover { background-color: #e55a3b; }
-        .footer { margin-top: 1.5rem; font-size: 0.8rem; color: #6b7280; text-align: center; }
+        
+        /* Footer Styling */
+        .footer-email {
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.75rem;
+            display: block;
+            font-size: 0.9rem;
+        }
+        .legal-box {
+            background-color: #f9fafb; /* Light grey background */
+            border: 1px solid #f3f4f6;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: left; /* Left indented text */
+            font-size: 0.75rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+        .legal-box strong {
+            color: #4b5563;
+        }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <!-- You can replace this src with your actual logo URL -->
+        <!-- Replace with your specific logo URL -->
         <img src="jasonchew.aitrainerlogo.png" alt="Logo" class="logo">
         
         <h2>Jason Chew's AI Classroom</h2>
         <h3>Candidate Application</h3>
+        
+        <!-- Added Description Text in Light Grey -->
+        <p class="description">
+            Please enter the Job Reference Code provided by the recruiter and upload your CV (PDF format) to begin the AI evaluation process.
+        </p>
 
-        <!-- IMPORTANT: The 'enctype' is required for file uploads -->
-        <form action="https://n8ncchew617.zeabur.app/webhook-test/submit-cv" method="POST" enctype="multipart/form-data">
+        <!-- IMPORTANT: Update 'action' with your Webhook URL -->
+        <form action="https://n8ncchew617.zeabur.app/webhook-test/submit-cv" enctype="multipart/form-data">
             
-            <!-- Field 1: Job ID (Text) -->
             <label for="job_id">Job Reference Code</label>
             <input type="text" id="job_id" name="job_id" placeholder="e.g. JOB-001" required>
 
-            <!-- Field 2: The CV File -->
-            <!-- Note: name="data" matches standard n8n binary input -->
             <label for="cv_file">Upload CV (PDF)</label>
             <input type="file" id="cv_file" name="data" accept=".pdf,.doc,.docx" required>
 
             <button type="submit">Submit Application</button>
         </form>
 
-        <div class="footer">
-           <div class="admin-email">cchew617@gmail.com</div>
-            <div class="disclaimer-box">
-                <div class="disclaimer-text">
-                    <span class="disclaimer-bold">Legal Disclaimer:</span> This tool is provided for educational and administrative convenience. Users are <span class="disclaimer-bold">solely responsible</span> for ensuring that their use of this scraper does not breach the copyright, intellectual property rights, or Terms of Service of the target website. 
-                    <br><br>
-                    <span class="disclaimer-bold">Jason Chew's AI Classroom</span> (App Owner) assumes no liability for any consequences arising from the actions of the user.
-                </div>
+        <!-- Footer Section -->
+        <div class="footer-section">
+            <span class="footer-email">cchew617@gmail.com</span>
+            
+            <div class="legal-box">
+                <strong>Legal Disclaimer:</strong> This tool is provided for educational and administrative convenience. Users are <strong>solely responsible</strong> for ensuring that their use of this automation does not breach data privacy laws or terms of service.
+                <br><br>
+                Jason Chew's AI Classroom (App Owner) assumes no liability for any consequences arising from the actions of the user.
             </div>
         </div>
     </div>
