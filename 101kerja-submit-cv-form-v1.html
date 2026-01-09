@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit CV - Jason Chew's AI Classroom</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9fafb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            object-fit: cover;
+            border: 2px solid #e5e7eb;
+        }
+        h2 { margin: 0 0 0.5rem 0; color: #111827; font-size: 1.5rem; font-weight: 700; }
+        h3 { margin: 0 0 0.5rem 0; color: #111827; font-weight: 700; font-size: 1.25rem; }
+        .description { color: #6b7280; margin: 0 0 2rem 0; font-size: 0.95rem; line-height: 1.5; }
+        label { display: block; text-align: left; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.9rem; }
+        
+        /* Updated Styles for Select Dropdown */
+        select, input[type="file"] {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            color: #4b5563;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        input[type="file"] { padding: 0.5rem; }
+        
+        button {
+            width: 100%;
+            padding: 0.85rem;
+            background-color: #ff6b4a; 
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(255, 107, 74, 0.2);
+        }
+        button:hover { background-color: #e55a3b; }
+        
+        .footer-title { font-weight: 700; color: #111827; margin-bottom: 0.75rem; display: block; font-size: 0.9rem; }
+        .legal-box {
+            background-color: #f9fafb;
+            border: 1px solid #f3f4f6;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.75rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+        .legal-box strong { color: #4b5563; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <img src="jasonchew.aitrainerlogo.png" alt="Logo" class="logo">
+        
+        <h2>Jason Chew's AI Classroom</h2>
+        <h3>Candidate Application [demo] </h3>
+        
+        <p class="description">
+            Select the position you are applying for and upload your CV to begin.
+        </p>
+
+        <!-- Main Form (Submits to your Workflow) -->
+        <!-- Note: This URL must point to your SUBMIT-CV webhook (POST method) -->
+        <form action="https://n8ncchew617.zeabur.app/webhook/submit-cv" method="POST" enctype="multipart/form-data">
+            
+            <label for="job_id">Select Position</label>
+            <!-- Dropdown List -->
+            <select id="job_id" name="job_id" required>
+                <option value="" disabled selected>Loading jobs...</option>
+            </select>
+
+            <label for="cv_file">Upload CV (PDF)</label>
+            <input type="file" id="cv_file" name="data" accept=".pdf,.doc,.docx" required>
+
+            <button type="submit">Submit Application</button>
+        </form>
+
+        <div class="footer-section">
+            <span class="footer-title">101 Kerja project</span>
+            <div class="legal-box">
+                <strong>Legal Disclaimer:</strong> This tool is for educational purposes only. Users are <strong>solely responsible</strong> for ensuring that their use of this automation does not breach data privacy laws.
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT TO FETCH JOBS -->
+    <script>
+        // ---------------------------------------------------------
+        // CONFIGURATION: Points to the 'GET JOBS' Webhook (GET method)
+        // ---------------------------------------------------------
+        const GET_JOBS_URL = "https://n8ncchew617.zeabur.app/webhook/101kerja-get-jobs"; 
+
+        async function loadJobs() {
+            const dropdown = document.getElementById("job_id");
+            try {
+                const response = await fetch(GET_JOBS_URL);
+                const data = await response.json();
+                
+                // --- DEBUGGING: Open Console (F12) to see this ---
+                console.log("Data received from n8n:", data);
+                
+                // Check if n8n returned an error message
+                if (data.message) {
+                    console.error("n8n Error:", data.message);
+                    dropdown.innerHTML = '<option value="" disabled>Error: ' + data.message + '</option>';
+                    return;
+                }
+
+                // SAFETY: Ensure 'data' is a list. If it's a single object, wrap it in brackets [ ].
+                const jobList = Array.isArray(data) ? data : [data];
+
+                // Clear the "Loading..." text
+                dropdown.innerHTML = '<option value="" disabled selected>-- Select a Job --</option>';
+
+                // Loop through the data
+                jobList.forEach(row => {
+                    // Ensure we are reading the correct columns from your Google Sheet
+                    const id = row["Job ID"];
+                    const title = row["Job Position"]; 
+                    const company = row["Company Name"]; // Added Company Name
+
+                    if(id && title) {
+                        const option = document.createElement("option");
+                        option.value = id; 
+                        
+                        // Display Format: JOB-001 - Company Name - Job Position
+                        if (company) {
+                            option.text = `${id} - ${company} - ${title}`; 
+                        } else {
+                            option.text = `${id} - ${title}`;
+                        }
+                        
+                        dropdown.appendChild(option);
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error fetching jobs:", error);
+                dropdown.innerHTML = '<option value="" disabled>Connection Failed (Check Console)</option>';
+            }
+        }
+
+        // Run the function when page opens
+        loadJobs();
+    </script>
+
+</body>
+</html>
+
