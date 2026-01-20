@@ -25,17 +25,17 @@
             text-align: center;
         }
         
-        /* --- UPDATED LOGO STYLE --- */
+        /* --- LOGO STYLE --- */
         .logo {
-            width: 100px;          /* Slightly larger for better visibility */
+            width: 100px;
             height: 100px;
-            border-radius: 50%;    /* Makes it a perfect circle */
+            border-radius: 50%;
             margin-bottom: 1rem;
-            object-fit: cover;     /* Ensures image doesn't stretch */
+            object-fit: cover;
             
             /* The Red Circle Effect */
-            border: 5px solid #ff6b4a; /* Thick coral/red border matching the button */
-            padding: 4px;              /* White space between image and border */
+            border: 5px solid #ff6b4a;
+            padding: 4px;
             background-color: white;   
         }
         /* -------------------------- */
@@ -69,7 +69,7 @@
         button {
             width: 100%;
             padding: 0.85rem;
-            background-color: #ff6b4a; /* Matches the Logo Border */
+            background-color: #ff6b4a;
             color: white;
             border: none;
             border-radius: 6px;
@@ -83,7 +83,19 @@
         }
         button:hover { background-color: #e55a3b; }
         
-        .footer-email { font-weight: 700; color: #111827; margin-bottom: 0.75rem; display: block; font-size: 0.9rem; }
+        /* Updated Footer Email Style for Link */
+        .footer-email { 
+            font-weight: 700; 
+            color: #111827; 
+            margin-bottom: 0.75rem; 
+            display: block; 
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .footer-email:hover {
+            color: #ff6b4a; /* Adds a hover effect color */
+        }
+
         .legal-box {
             background-color: #f9fafb;
             border: 1px solid #f3f4f6;
@@ -101,7 +113,6 @@
 
     <div class="card">
         <!-- Logo Image -->
-        <!-- Ensure this file exists in your directory -->
         <img src="jasonchew.aitrainerlogo.png" alt="Logo" class="logo">
         
         <h2>Jason Chew's AI Classroom</h2>
@@ -112,34 +123,35 @@
         </p>
 
         <!-- FORM START -->
-        <!-- REMINDER: Replace ACTION with your n8n Webhook URL -->
         <form action="https://n8ncchew617.zeabur.app/webhook/upload-receipt" method="POST" enctype="multipart/form-data">
             
             <!-- 1. Full Name -->
-            <label for="full_name">Full Name</label>
+            <label for="full_name">Full Name*</label>
             <input type="text" id="full_name" name="full_name" placeholder="Enter Your Full Name" required>
 
             <!-- 2. NRIC Number -->
-            <label for="nric">NRIC Number</label>
+            <label for="nric">NRIC Number*</label>
             <input type="text" id="nric" name="nric" placeholder="e.g. 700102-14-XXXX" required>
 
             <!-- 3. Mobile Phone -->
-            <label for="phone">Mobile Phone</label>
+            <label for="phone">Mobile Phone*  [e.g. +60121234567]</label>
             <input type="tel" id="phone" name="phone" placeholder="e.g. +60121234567" required>
 
             <!-- 4. Receipt Image -->
-            <label for="receipt_image">Upload Receipt Image   [e.g. .jpg,.jpeg,.png]</label>
+            <label for="receipt_image">Upload Receipt Image* [e.g. .jpg,.jpeg,.png]</label>
             <input type="file" id="receipt_image" name="data" accept=".jpg,.jpeg,.png" required>
 
             <!-- 5. Transaction Purpose -->
-            <label for="purpose">Transaction Purpose</label>
-            <textarea id="purpose" name="purpose" placeholder="e.g. event code, transaction code or description"></textarea>
+            <label for="purpose">Transaction Purpose*</label>
+            <textarea id="purpose" name="purpose" placeholder="e.g. event code, transaction code or description" required></textarea>
 
             <button type="submit">Submit Receipt</button>
         </form>
 
         <div class="footer-section">
-            <span class="footer-email">Jasonchew.HRDCtrainer@gmail.com</span>
+            <!-- Clickable Email Link -->
+            <a href="mailto:Jasonchew.HRDCtrainer@gmail.com" class="footer-email" style="text-decoration: none;">Jasonchew.HRDCtrainer@gmail.com</a>
+            
             <div class="legal-box">
                 <strong>Legal Disclaimer:</strong> This tool is for educational purpose only. Users are <strong>solely responsible</strong> for ensuring that their use of this automation does not breach data privacy laws.
             </div>
