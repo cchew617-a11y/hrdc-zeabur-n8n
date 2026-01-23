@@ -24,7 +24,7 @@
         /* --- HEADER SECTION --- */
         .header {
             display: flex;
-            align-items: center; /* Aligns center vertically */
+            align-items: center;
             justify-content: space-between;
             padding-bottom: 20px;
             margin-bottom: 20px;
@@ -38,9 +38,8 @@
 
         h1 {
             margin: 0;
-            /* UPDATED: Increased font size to match reference image */
             font-size: 2.2rem; 
-            font-weight: 900; /* Extra bold */
+            font-weight: 900;
             color: #000;
             line-height: 1.1;
         }
@@ -87,8 +86,7 @@
 
         input[type="text"], 
         input[type="email"],
-        input[type="tel"],
-        select {
+        input[type="tel"] {
             width: 100%;
             padding: 12px 15px;
             margin-bottom: 25px;
@@ -104,17 +102,35 @@
             color: #9ca3af;
         }
 
-        /* Dropdown Styling - Added border color from image */
-        select {
-            border: 1px solid #000; /* Darker border for the select box as per image */
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px top 50%;
-            background-size: 10px auto;
-            cursor: pointer;
+        /* --- CHECKBOX STYLING (New) --- */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* Space between options */
+            margin-bottom: 25px;
+            padding: 5px 0;
         }
 
+        .checkbox-option {
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #333;
+            font-weight: 400; /* Regular weight for options */
+            line-height: 1.4;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            /* Reset default styling slightly */
+            width: 20px;
+            height: 20px;
+            margin: 0 12px 0 0;
+            cursor: pointer;
+            accent-color: #f44336; /* Makes the checkmark background Red */
+        }
+
+        /* Button Styling */
         button {
             width: 100%;
             padding: 14px;
@@ -174,24 +190,8 @@
             <label for="Mobile Phone">Mobile Phone Number</label>
             <input type="tel" id="Mobile Phone" name="Mobile Phone" placeholder="+60123456789">
 
-            <label for="Interest">I am most interested in:*</label>
-            <select id="Interest" name="Interest" required>
-                <option value="" disabled selected>Select an option...</option>
-                <option value="Build App with Vibe Coding for Students">Build App with Vibe Coding for Students</option>
-                <option value="Gemini AI Suite for Students">Gemini AI Suite for Students</option>
-                <option value="CRM Integration and Sales Process Automation for SME">CRM Integration and Sales Process Automation for SME</option>
-            </select>
-
-            <input type="hidden" name="submittedAt" value="" id="submittedAt">
-
-            <button type="submit" onclick="document.getElementById('submittedAt').value = new Date().toISOString();">Send</button>
-        </form>
-
-        <!-- Footer -->
-        <div class="footer">
-            Contact: <a href="mailto:JasonChew.HRDCtrainer@gmail.com">JasonChew.HRDCtrainer@gmail.com</a>
-        </div>
-    </div>
-
-</body>
-</html>
+            <!-- REPLACED DROPDOWN WITH CHECKBOXES -->
+            <label>I am most interested in (Select all that apply):*</label>
+            <div class="checkbox-group">
+                <label class="checkbox-option">
+                    <input type="checkbox" name="Interest" value="Build App with Vibe Coding for Students">
