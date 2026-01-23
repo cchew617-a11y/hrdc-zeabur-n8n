@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jason Chew's AI Classroom Club - Inquiry</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+        }
+
+        /* --- HEADER SECTION --- */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+        }
+
+        .header-text {
+            flex: 1;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #000;
+        }
+
+        .subtitle {
+            margin: 5px 0 0 0;
+            font-size: 1rem;
+            color: #888;
+        }
+        
+        .subtitle span {
+            color: #aaa;
+            font-weight: 400;
+        }
+
+        /* Profile Image */
+        .profile-container {
+            margin: 0 15px;
+        }
+        
+        .profile-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            /* Neon border effect similar to image */
+            border: 2px solid #00fff2; 
+            box-shadow: 0 0 8px rgba(0, 255, 242, 0.5);
+            background-color: #333;
+        }
+
+        /* Language Switcher */
+        .lang-switch {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #444;
+            display: flex;
+            gap: 10px;
+            align-self: flex-start;
+            margin-top: 5px;
+        }
+
+        .lang-switch span.active {
+            color: #d32f2f; /* Red for active language */
+        }
+        
+        .lang-switch span {
+            cursor: pointer;
+        }
+
+        /* --- FORM STYLES --- */
+        form {
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #222;
+        }
+
+        input[type="text"], 
+        input[type="email"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #dcdcdc;
+            border-radius: 6px;
+            font-size: 1rem;
+            color: #333;
+            background-color: #fff;
+            box-sizing: border-box; /* Ensures padding doesn't widen element */
+        }
+
+        input::placeholder {
+            color: #9ca3af;
+        }
+
+        /* Dropdown Styling */
+        select {
+            appearance: none; /* Removes default arrow to style custom if needed, standard looks okay */
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px top 50%;
+            background-size: 12px auto;
+            cursor: pointer;
+        }
+
+        /* Submit Button */
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #f44336; /* Red color from screenshot */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #d32f2f;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #666;
+            padding-bottom: 20px;
+        }
+
+        .footer a {
+            color: #1a0dab; /* Standard link blue */
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-text">
+                <h1>Jason Chew’s AI Classroom Club</h1>
+                <p class="subtitle">Inquiry Form <span class="light">(free membership)</span></p>
+            </div>
+            
+            <div class="profile-container">
+                <!-- Placeholder image used. Replace 'jasonchew.png' with actual path -->
+                <img src="https://via.placeholder.com/60/000000/00fff2?text=JC" alt="Jason Chew" class="profile-img">
+            </div>
+
+            <div class="lang-switch">
+                <span class="active">EN</span>
+                <span>MY</span>
+                <span>中文</span>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form action="https://n8ncchew617.zeabur.app/webhook/885da6c7-22de-4979-8c06-1373e36470d4" method="POST">
+            
+            <!-- Name -->
+            <label for="Name">Name *</label>
+            <input type="text" id="Name" name="Name" placeholder="Jason Chew" required>
+
+            <!-- Email -->
+            <label for="Email">Email *</label>
+            <input type="email" id="Email" name="Email" placeholder="JasonChew.HRDC@gmail.com" required>
+
+            <!-- Mobile Phone -->
+            <label for="Mobile Phone">Mobile Phone Number</label>
+            <input type="tel" id="Mobile Phone" name="Mobile Phone" placeholder="+60123456789">
+
+            <!-- Dropdown Interest -->
+            <label for="Interest">You are most interested in:*</label>
+            <select id="Interest" name="Interest" required>
+                <option value="" disabled selected>Select an option...</option>
+                <option value="Build App with Vibe Coding for Students">Build App with Vibe Coding for Students</option>
+                <option value="Gemini AI Suite for Students">Gemini AI Suite for Students</option>
+                <option value="CRM Integration and Sales Process Automation for SME">CRM Integration and Sales Process Automation for SME</option>
+            </select>
+
+            <!-- Hidden Time Field -->
+            <input type="hidden" name="submittedAt" value="" id="submittedAt">
+
+            <!-- Submit Button -->
+            <button type="submit" onclick="document.getElementById('submittedAt').value = new Date().toISOString();">Send</button>
+        </form>
+
+        <!-- Footer -->
+        <div class="footer">
+            Contact: <a href="mailto:JasonChewHDRCTrainer@gmail.com">JasonChewHDRCTrainer@gmail.com</a>
+        </div>
+    </div>
+
+</body>
+</html>
