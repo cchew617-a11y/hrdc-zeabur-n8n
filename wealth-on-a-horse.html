@@ -6,8 +6,6 @@
     <title>馬上有錢！ (Wealth on a horse!)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tone.js (Only used for the dull 'thud' kick sound, no melodies) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -20,7 +18,6 @@
             font-family: 'Noto Sans TC', sans-serif;
             touch-action: manipulation;
             background-color: var(--temple-red);
-            /* Traditional roof tile pattern */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='20' viewBox='0 0 100 20'%3E%3Cpath d='M0 10 Q 25 0 50 10 T 100 10' fill='none' stroke='%23a52a2a' stroke-width='1'/%3E%3C/svg%3E");
             height: 100vh;
             height: 100dvh;
@@ -206,7 +203,6 @@
             100% { transform: translate(calc(-50% + var(--tx-end)), calc(-50% + var(--ty-end))) scale(1); opacity: 0; }
         }
 
-        /* Lucky Number Display */
         .lucky-number-display {
             position: absolute;
             top: 50%;
@@ -289,7 +285,6 @@
     </div>
 
     <main id="game-container" class="main-stage cursor-pointer">
-        
         <div class="text-center px-4">
             <h1 class="text-5xl md:text-6xl font-black text-yellow-400 tracking-tight drop-shadow-lg">神馬踢飛小人廟</h1>
             <h2 class="text-xl md:text-3xl font-bold text-white italic mt-1">馬上有錢，衰人走遠</h2>
@@ -334,7 +329,6 @@
                 已蹄爆：<span id="counter">0</span> 次
             </div>
         </div>
-
     </main>
 
     <footer class="w-full text-center py-4 z-50">
@@ -373,36 +367,57 @@
         const defaultVillainSrc = villainImage.src;
 
         let hitCount = 0;
-        let isSoundReady = false;
+        let isAudioUnlocked = false;
         let isFlattened = false;
         let hasUploaded = false;
 
-        // --- 1. SETUP AUDIO ---
+        // --- AUDIO CONFIGURATION ---
         
-        // A. The Horse Sound
+        // 1. Horse Sound
         const horseAudio = new Audio('https://www.google.com/logos/fnbx/animal_sounds/horse.mp3');
         
-        // B. The CNY Music (Main & Backup)
-        // 1. Try your specific file first
+        // 2. CNY Music Setup
         const userMusicFile = 'viacheslavstarostin-chinese-lunar-new-year-465871.mp3';
-        // 2. Fallback to this Real MP3 (Not Tone.js) if local file is missing
-        const backupMusicUrl = 'https://raw.githubusercontent.com/sk2589822/Exams/master/audio/chunjie.mp3'; 
-
+        // BACKUP: High quality "Gong Xi Fa Cai" Festive Music (Royalty Free URL)
+        const backupMusicUrl = 'https://cdn.pixabay.com/audio/2022/01/20/audio_2692a54388.mp3'; 
+        
         const cnyMusic = new Audio();
-        // Pre-set to user file, but don't load yet
+        // Set default to user file
         cnyMusic.src = userMusicFile;
+        cnyMusic.volume = 1.0;
 
-        // Logic: Wait for Horse to finish, THEN play music
+        // --- THE "SILENCE FIX" ---
+        // Browsers block audio that starts too long after a click.
+        // We must "bless" the audio object on the very first interaction.
+        const blessAudioSystem = () => {
+            if (!isAudioUnlocked) {
+                // Force browser to acknowledge the music object exists
+                // We play and immediately pause. This unlocks it for later.
+                cnyMusic.play().then(() => {
+                    cnyMusic.pause();
+                    cnyMusic.currentTime = 0;
+                }).catch(e => {
+                    console.log("Blessing failed (normal if source not ready yet)");
+                });
+                
+                horseAudio.load();
+                isAudioUnlocked = true;
+            }
+        };
+
+        // --- PLAYBACK LOGIC ---
+        
+        // When horse finishes, play music
         horseAudio.onended = () => {
-            console.log("Horse finished. Now playing music.");
+            console.log("Horse finished. Triggering music...");
             
-            // Try playing the current src (defaults to user file)
-            let p = cnyMusic.play();
+            // Try to play the current source (user file)
+            let playPromise = cnyMusic.play();
             
-            if (p !== undefined) {
-                p.catch(error => {
-                    console.log("User file failed/missing. Switching to Backup MP3.");
-                    // Switch to backup URL immediately
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.warn("Local file failed/missing. Switching to Backup MP3 immediately.");
+                    // Switch to the reliable backup URL
                     cnyMusic.src = backupMusicUrl;
                     cnyMusic.load();
                     cnyMusic.play();
@@ -410,28 +425,37 @@
             }
         };
 
-        // If the audio tag itself throws an error (e.g. 404), switch to backup
+        // If the audio tag encounters an error (like 404) during loading
         cnyMusic.onerror = () => {
-            console.log("Audio error detected. Switching to backup.");
-            if (cnyMusic.src.indexOf(backupMusicUrl) === -1) {
+            console.warn("Audio Error (404/Format). Switching to backup.");
+            if (cnyMusic.src !== backupMusicUrl) {
                 cnyMusic.src = backupMusicUrl;
-                cnyMusic.load();
-                // We don't play here immediately; we let the play() call handle it or next trigger
+                // Don't auto play here, wait for horse.onended to trigger it
             }
         };
 
-        // --- 2. SIMPLE KICK SOUND (No Orchestra) ---
-        // Using Tone.js only for a simple "thud" sound on kick
-        const kickSynth = new Tone.MembraneSynth({
-            pitchDecay: 0.05,
-            octaves: 4,
-            oscillator: { type: "sine" },
-            envelope: { attack: 0.001, decay: 0.2, sustain: 0.01, release: 0.1 },
-            volume: 10
-        }).toDestination();
+        // --- KICK SOUND (Simple Web Audio API for fast response) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        const playKickSound = () => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.frequency.value = 150;
+            osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.5);
+        };
 
-        // --- 3. VISUALS ---
+        // --- GAMEPLAY ---
 
+        // Visuals
         const horseEmojis = ['🐴', '🎠', '🏇', '🐎', '🦓', '🦄', '🐎', '🐴'];
         for (let i = 0; i < 60; i++) {
             const span = document.createElement('span');
@@ -444,15 +468,6 @@
             emojiBg.appendChild(span);
         }
 
-        const unlockAudio = async () => {
-            if (!isSoundReady) {
-                await Tone.start();
-                kickSynth.triggerAttackRelease("C2", "64n"); // Silent unlock
-                horseAudio.load(); // Preload horse
-                isSoundReady = true;
-            }
-        };
-
         const triggerHaptic = (isBigHit = false) => {
             if (navigator.vibrate) {
                 try {
@@ -464,7 +479,8 @@
         const handleHit = (e) => {
             if (e.target.closest('button') || e.target.closest('label')) return;
             
-            unlockAudio();
+            // UNLOCK AUDIO ON FIRST CLICK
+            blessAudioSystem();
 
             if (!hasUploaded) {
                 toast.style.opacity = '1';
@@ -479,12 +495,11 @@
             const x = e.clientX || (e.touches && e.touches[0].clientX);
             const y = e.clientY || (e.touches && e.touches[0].clientY);
 
-            // --- HIT LOGIC ---
             if (hitCount % 50 === 0) {
-                // BIG HIT: Only play Horse. Music follows automatically via 'onended'
+                // --- BIG HIT (50th) ---
                 horseAudio.currentTime = 0;
-                horseAudio.play().catch(e => console.error("Horse failed:", e));
-
+                horseAudio.play().catch(e => console.error("Horse play error:", e));
+                
                 triggerHaptic(true);
 
                 isFlattened = true;
@@ -493,9 +508,7 @@
 
                 triggerProsperityRain();
                 
-                setTimeout(() => {
-                    showLuckyNumber();
-                }, 500); 
+                setTimeout(() => showLuckyNumber(), 500); 
 
                 setTimeout(() => {
                     villainContainer.classList.remove('villain-flattened');
@@ -503,21 +516,18 @@
                     isFlattened = false;
                     printsLayer.innerHTML = '';
                     
-                    // Reset Music
+                    // Stop Music
                     cnyMusic.pause();
                     cnyMusic.currentTime = 0;
-                }, 7000);
+                }, 7000); // 7 seconds celebration
 
             } else {
-                // SMALL HIT: Just the thud sound
-                if(isSoundReady) {
-                    // This is NOT the orchestra. Just a drum kick.
-                    kickSynth.triggerAttackRelease("C2", "8n");
-                }
+                // --- SMALL HIT ---
+                playKickSound();
                 triggerHaptic(false);
             }
 
-            // Animations
+            // Visuals
             const frame = document.getElementById('villain-image-wrapper');
             frame.classList.remove('shake-active');
             void frame.offsetWidth; 
@@ -642,6 +652,7 @@
             document.getElementById('villain-image-wrapper').classList.remove('shake-active');
             villainContainer.classList.remove('villain-flattened');
             dizzyStars.classList.remove('active');
+            
             // Reset Audio
             horseAudio.pause();
             horseAudio.currentTime = 0;
