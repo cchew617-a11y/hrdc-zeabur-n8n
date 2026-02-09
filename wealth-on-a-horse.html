@@ -303,7 +303,7 @@
             </div>
 
             <div id="villain-image-wrapper" class="villain-frame">
-                <img id="villain-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTEwIiByPSI3MCIgZmlsbD0iI2I0NWYwNiIvPgogIDxjaXJjbGUgY3g9Ijc1IiBjeT0iOTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEyNSIgY3k9Ijk1IiByPSIyMCIgZmlsbD0id2hpdGUiLz4KICA8cGF0aCBkPSJNNzAgMTM1IEMgODAgMTUwLCAxMjAgMTUwLCAxMzAgMTM1IiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=" class="w-full h-full object-cover">
+                <img id="villain-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTEwIiByPSI3MCIgZmlsbD0iI2I0NWYwNiIvPgogIDxjaXJjbGUgY3g9Ijc1IiBjeT0iOTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEyNSIgY3k9Ijk1IiByPSIyMCIgZmlsbD0id2hpdGUiLz4KICA8cGF0aCBdD0JNNzAgMTM1IEMgODAgMTUwLCAxMjAgMTUwLCAxMzAgMTM1IiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=" class="w-full h-full object-cover">
                 <div id="image-overlay-hint" class="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
                     <span class="text-white font-bold text-sm bg-red-600 px-3 py-1 rounded-full border border-yellow-400">鎖定小人對象</span>
                 </div>
@@ -383,7 +383,7 @@
 
         const cnyMusic = new Audio();
         cnyMusic.src = userMusicFile;
-        cnyMusic.volume = 0; // Start at zero to prevent sudden loud music
+        cnyMusic.volume = 0; // Start at zero
         cnyMusic.loop = true; // Ensure music loops
 
         cnyMusic.onerror = () => {
@@ -393,38 +393,54 @@
             }
         };
 
-        const blessAudioSystem = () => {
-            if (!isAudioUnlocked) {
-                // Play and immediately pause a sound to unlock the audio context
-                // for ALL audio elements. Using a tiny silent mp3.
-                const silentSound = new Audio();
-                silentSound.src = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU1UAAAAPAAADTGF2ZjU4LjM1LjEwMAAAAAAAAAAAAAAA//tAxAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVFRTbm9uZQAAAAAAAAAAAAAA//sAwgAAAZAAAADkAAAEhGVwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD/7AMAwAEABQAAAAAUAAADsQAAAAMAAgAAAEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABTbm9uZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/7ADo0ABlFAAAAQAAAOQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-                silentSound.volume = 0;
-                silentSound.play().then(() => {
-                    silentSound.pause();
-                    silentSound.remove(); // Clean up the silent audio element
-                    isAudioUnlocked = true;
-                    console.log("Audio context unlocked!");
-                }).catch(e => {
-                    console.error("Failed to unlock audio context:", e);
-                });
+        // Function to unlock audio context on the first user interaction
+        const unlockAudio = async () => {
+            if (isAudioUnlocked) return;
+
+            try {
+                // For Web Audio API (Tone.js)
+                await Tone.start();
+                console.log("Tone.js audio context unlocked.");
+
+                // For HTML5 Audio elements
+                // Attempt to play a silent sound and pause immediately
+                // This "blesses" the HTML5 audio elements for future playback
+                const silentAudio = new Audio();
+                silentAudio.src = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU1UAAAAPAAADTGF2ZjU4LjM1LjEwMAAAAAAAAAAAAAAA//tAxAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVFRTbm9uZQAAAAAAAAAAAAAA//sAwgAAAZAAAADkAAAEhGVwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD/7AMAwAEABQAAAAAUAAADsQAAAAMAAgAAAEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABTbm9uZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/7ADo0ABlFAAAAQAAAOQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+                silentAudio.volume = 0; // Ensure it's silent
+                await silentAudio.play();
+                silentAudio.pause();
+                silentAudio.remove(); // Clean up
+
+                // Attempt to play and pause CNY music to bless it specifically
+                await cnyMusic.play();
+                cnyMusic.pause();
+                cnyMusic.currentTime = 0; // Reset for actual playback
+
+                isAudioUnlocked = true;
+                console.log("All audio contexts unlocked!");
+
+            } catch (e) {
+                console.error("Failed to unlock audio context:", e);
+                // In case of error, still set unlocked to true to avoid repeated attempts
+                // but console log the issue.
+                isAudioUnlocked = true;
             }
         };
 
-        // Call blessAudioSystem on the first user interaction with the game container
-        // Use { once: true } to ensure it only runs once
-        gameContainer.addEventListener('mousedown', blessAudioSystem, { once: true });
-        gameContainer.addEventListener('touchstart', blessAudioSystem, { once: true });
+        // Attach the unlockAudio function to the first mousedown/touchstart event on the document
+        // This ensures ANY interaction on the page unlocks audio
+        document.addEventListener('mousedown', unlockAudio, { once: true });
+        document.addEventListener('touchstart', unlockAudio, { once: true });
 
 
         // --- UPLOAD HANDLER ---
-        // Explicit click handler for the button to open file dialog
         uploadBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Stop game click
-            uploadInput.click(); // Open file dialog
+            e.stopPropagation();
+            uploadInput.click();
         });
 
-        uploadInput.addEventListener('click', (e) => e.stopPropagation()); // Stop input click from bubbling
+        uploadInput.addEventListener('click', (e) => e.stopPropagation());
 
         uploadInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -457,11 +473,13 @@
             }
         };
 
-        const handleHit = (e) => {
+        const handleHit = async (e) => { // Made async to await unlockAudio if needed
             if (e.target.closest('button') || e.target.closest('input')) return;
 
-            // blessAudioSystem() is now called once on the first interaction with gameContainer
-            // No need to call it repeatedly here.
+            // Ensure audio is unlocked on first meaningful interaction
+            if (!isAudioUnlocked) {
+                await unlockAudio(); // Await to ensure context is ready
+            }
 
             if (!hasUploaded) {
                 toast.style.opacity = '1';
@@ -481,10 +499,9 @@
                 horseAudio.currentTime = 0;
                 horseAudio.play().catch(e => console.error("Horse audio failed to play:", e));
 
-                // Start music playing (volume is 0 initially)
+                cnyMusic.currentTime = 0; // Ensure music starts from beginning
                 cnyMusic.play().catch(e => {
                     console.error("CNY music failed to play:", e);
-                    // Fallback to backup source if initial play fails
                     if (cnyMusic.src !== musicSource) {
                         cnyMusic.src = musicSource;
                         cnyMusic.play();
@@ -492,9 +509,8 @@
                 });
 
                 // Smoothly ramp up the music volume after the horse sound
-                // This ensures it doesn't unmute before the horse sound ends.
                 setTimeout(() => {
-                    if (isAudioUnlocked) { // Ensure audio context is running
+                    if (isAudioUnlocked) {
                         cnyMusic.volume = 0.8; // Set desired volume
                     }
                 }, 1300); // Adjust timing based on horse audio duration
@@ -518,13 +534,10 @@
                 }, 7000);
             } else {
                 // --- SMALL HIT ---
-                if(Tone.context.state !== 'running') {
-                    // This will start Tone.js audio context on a user gesture
-                    Tone.start().then(() => kickSynth.triggerAttackRelease("C2", "8n"))
-                        .catch(e => console.error("Tone.js start failed:", e));
-                } else {
-                    kickSynth.triggerAttackRelease("C2", "8n");
+                if (Tone.context.state !== 'running') {
+                    await Tone.start(); // Ensure Tone.js context is running
                 }
+                kickSynth.triggerAttackRelease("C2", "8n");
                 triggerHaptic(false);
             }
 
@@ -647,8 +660,9 @@
         window.addEventListener('mousedown', handleHit);
         window.addEventListener('touchstart', (e) => {
             if (e.target.closest('button') || e.target.closest('input')) return;
+            e.preventDefault(); // Prevent default touch behavior (e.g., scrolling)
             handleHit(e);
-        }, { passive: true });
+        }, { passive: false }); // passive: false to allow preventDefault
     </script>
 </body>
 </html>
