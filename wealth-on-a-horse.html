@@ -6,6 +6,8 @@
     <title>馬上有錢！ (Wealth on a horse!)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tone.js (Kick sound only) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -371,33 +373,45 @@
         let isFlattened = false;
         let hasUploaded = false;
 
-        // --- AUDIO CONFIGURATION ---
+        // --- AUDIO CONFIGURATION (ROBUST FIX) ---
         
         // 1. Horse Sound
         const horseAudio = new Audio('https://www.google.com/logos/fnbx/animal_sounds/horse.mp3');
         
-        // 2. CNY Music Setup
-        const userMusicFile = 'viacheslavstarostin-chinese-lunar-new-year-465871.mp3';
-        // BACKUP: High quality "Gong Xi Fa Cai" Festive Music (Royalty Free URL)
-        const backupMusicUrl = 'https://cdn.pixabay.com/audio/2022/01/20/audio_2692a54388.mp3'; 
+        // 2. CNY Music Playlist (Try User File -> Try Backup A -> Try Backup B)
+        const musicSources = [
+            'viacheslavstarostin-chinese-lunar-new-year-465871.mp3', // User File
+            'https://raw.githubusercontent.com/pe601/mp3/master/GongXiFaCai.mp3', // Backup A (Safe English URL)
+            'https://raw.githubusercontent.com/sk2589822/Exams/master/audio/chunjie.mp3' // Backup B
+        ];
         
+        let currentSourceIndex = 0;
         const cnyMusic = new Audio();
-        // Set default to user file
-        cnyMusic.src = userMusicFile;
-        cnyMusic.volume = 1.0;
+        
+        // Function to try loading the next source if one fails
+        const loadMusicSource = (index) => {
+            if (index < musicSources.length) {
+                console.log(`Trying music source ${index}: ${musicSources[index]}`);
+                cnyMusic.src = musicSources[index];
+                cnyMusic.load();
+            } else {
+                console.warn("All music sources failed.");
+            }
+        };
 
-        // --- THE "SILENCE FIX" ---
-        // Browsers block audio that starts too long after a click.
-        // We must "bless" the audio object on the very first interaction.
+        // Initialize with first source
+        loadMusicSource(0);
+
+        // --- AUDIO UNLOCK (CRITICAL) ---
+        // Browsers block audio unless unlocked by user gesture.
         const blessAudioSystem = () => {
             if (!isAudioUnlocked) {
-                // Force browser to acknowledge the music object exists
-                // We play and immediately pause. This unlocks it for later.
+                // Play and immediately pause to "warm up" the audio engine
                 cnyMusic.play().then(() => {
                     cnyMusic.pause();
                     cnyMusic.currentTime = 0;
                 }).catch(e => {
-                    console.log("Blessing failed (normal if source not ready yet)");
+                    // It might fail if source 0 is missing, that's fine, we handle error below
                 });
                 
                 horseAudio.load();
@@ -407,51 +421,43 @@
 
         // --- PLAYBACK LOGIC ---
         
-        // When horse finishes, play music
+        // 1. When Horse Ends -> Play Music
         horseAudio.onended = () => {
             console.log("Horse finished. Triggering music...");
+            cnyMusic.volume = 1.0;
+            cnyMusic.currentTime = 0;
             
-            // Try to play the current source (user file)
-            let playPromise = cnyMusic.play();
-            
+            const playPromise = cnyMusic.play();
             if (playPromise !== undefined) {
                 playPromise.catch(error => {
-                    console.warn("Local file failed/missing. Switching to Backup MP3 immediately.");
-                    // Switch to the reliable backup URL
-                    cnyMusic.src = backupMusicUrl;
-                    cnyMusic.load();
-                    cnyMusic.play();
+                    console.warn("Current source failed to play. Trying next...");
+                    // Force switch to next source
+                    currentSourceIndex++;
+                    loadMusicSource(currentSourceIndex);
+                    // Try playing immediately after switch
+                    cnyMusic.oncanplay = () => {
+                        cnyMusic.play();
+                        cnyMusic.oncanplay = null; // Remove listener
+                    };
                 });
             }
         };
 
-        // If the audio tag encounters an error (like 404) during loading
+        // 2. If Loading Fails (404/Network Error)
         cnyMusic.onerror = () => {
-            console.warn("Audio Error (404/Format). Switching to backup.");
-            if (cnyMusic.src !== backupMusicUrl) {
-                cnyMusic.src = backupMusicUrl;
-                // Don't auto play here, wait for horse.onended to trigger it
-            }
+            console.warn(`Source ${currentSourceIndex} failed to load. Switching...`);
+            currentSourceIndex++;
+            loadMusicSource(currentSourceIndex);
         };
 
-        // --- KICK SOUND (Simple Web Audio API for fast response) ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        const playKickSound = () => {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            osc.frequency.value = 150;
-            osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-            
-            osc.start(audioCtx.currentTime);
-            osc.stop(audioCtx.currentTime + 0.5);
-        };
+        // --- KICK SOUND (Tone.js) ---
+        const kickSynth = new Tone.MembraneSynth({
+            pitchDecay: 0.05,
+            octaves: 4,
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.001, decay: 0.2, sustain: 0.01, release: 0.1 },
+            volume: 10
+        }).toDestination();
 
         // --- GAMEPLAY ---
 
@@ -523,7 +529,8 @@
 
             } else {
                 // --- SMALL HIT ---
-                playKickSound();
+                if(Tone.context.state !== 'running') { Tone.start(); }
+                kickSynth.triggerAttackRelease("C2", "8n");
                 triggerHaptic(false);
             }
 
