@@ -54,16 +54,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Changed from space-around to prevent spreading too wide */
+            justify-content: flex-start;
             padding: 10px 0;
             z-index: 10;
-            overflow-y: auto; /* Allow scrolling on very small screens */
+            overflow-y: auto;
         }
 
         #villain-container {
             position: relative;
             width: 240px;
-            height: 260px; /* Slightly reduced height */
+            height: 260px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -100,7 +100,6 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
-        /* UPDATED: More violent shake animation for visual impact */
         @keyframes shake {
             0% { transform: translate(2px, 2px) rotate(0deg); }
             10% { transform: translate(-2px, -4px) rotate(-2deg); }
@@ -193,10 +192,11 @@
             100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
         }
 
+        /* UPDATED: Increased Font Size for Curses */
         .curse-text {
             position: absolute;
             pointer-events: none;
-            font-size: 2.5rem;
+            font-size: 4rem; /* Changed from 2.5rem */
             font-weight: 900;
             color: #fef08a;
             text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
@@ -210,6 +210,7 @@
             100% { transform: translate(calc(-50% + var(--tx-end)), calc(-50% + var(--ty-end))) scale(1); opacity: 0; }
         }
 
+        /* UPDATED: Shrunk the lucky number box */
         .lucky-number-display {
             position: absolute;
             top: 50%;
@@ -219,9 +220,9 @@
             pointer-events: none;
             text-align: center;
             width: fit-content;
-            min-width: 250px;
-            max-width: 90%;
-            padding: 15px 25px;
+            min-width: 150px; /* Reduced from 250px */
+            max-width: 80%;
+            padding: 10px 15px; /* Reduced padding */
             background: rgba(40, 0, 0, 0.98);
             border: 4px solid #fbbf24;
             border-radius: 20px;
@@ -278,9 +279,11 @@
             h2 { font-size: 1.2rem !important; }
             .btn-game { min-width: 110px; padding: 0.7rem; font-size: 0.875rem; }
             .counter-box { padding: 0.6rem 1.5rem; margin-top: 10px; }
-            .curse-text { font-size: 1.8rem; }
+            /* UPDATED: Increased mobile font size for curses */
+            .curse-text { font-size: 2.8rem; } 
             .villain-tag { bottom: 15px; font-size: 1rem; padding: 0.25rem 1rem; }
-            .lucky-number-display { min-width: 200px; padding: 10px 15px; }
+            /* UPDATED: Smaller lucky box on mobile */
+            .lucky-number-display { min-width: 140px; padding: 8px 12px; }
         }
     </style>
 </head>
@@ -339,7 +342,6 @@
             </div>
         </div>
 
-        <!-- MOVED FOOTER CONTENT HERE: Directly below counter -->
         <div class="w-full text-center mt-3 pb-6 z-50 shrink-0">
             <div class="text-yellow-100/60 text-[11px] px-4 leading-tight">免責聲明：本遊戲純屬娛樂，馬蹄之下眾生平等。</div>
             <div class="mt-2">
@@ -463,15 +465,12 @@
             volume: 10
         }).toDestination();
 
-        // UPDATED HAPTIC LOGIC: Increased intensity
         const triggerHaptic = (isBigHit = false) => {
             if (navigator.vibrate) {
                 try { 
                     if (isBigHit) {
-                        // Aggressive pattern: Vibrate, pause, vibrate, pause, long vibrate
                         navigator.vibrate([500, 50, 500, 50, 1000]); 
                     } else {
-                        // Stronger single tap (200ms instead of 50ms)
                         navigator.vibrate(200); 
                     }
                 } catch(e) {}
@@ -515,7 +514,7 @@
                     }
                 }, 1300);
 
-                triggerHaptic(true); // Trigger big vibration
+                triggerHaptic(true); 
                 isFlattened = true;
                 villainContainer.classList.add('villain-flattened');
                 dizzyStars.classList.add('active');
@@ -537,7 +536,7 @@
                     await Tone.start().catch(e => console.error("Tone.start failed:", e));
                 }
                 kickSynth.triggerAttackRelease("C2", "8n");
-                triggerHaptic(false); // Trigger stronger small vibration
+                triggerHaptic(false); 
             }
 
             const frame = document.getElementById('villain-image-wrapper');
@@ -611,7 +610,7 @@
                         item.style.fontSize = (25 + Math.random() * 25) + 'px';
                     } else {
                         item.innerText = blessings[Math.floor(Math.random() * blessings.length)];
-                        item.style.fontSize = (40 + Math.random() * 20) + 'px';
+                        item.style.fontSize = (30 + Math.random() * 20) + 'px';
                         item.style.color = '#fbbf24';
                         item.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
                     }
@@ -623,13 +622,15 @@
             }
         };
 
+        // UPDATED: Smaller lucky box content
         const showLuckyNumber = () => {
             const luckyNum = Math.floor(1000 + Math.random() * 8999);
             const container = document.createElement('div');
             container.className = 'lucky-number-display';
+            // Reduced font sizes below: text-lg for header, text-6xl for number
             container.innerHTML = `
-                <div class="text-yellow-400 text-2xl font-black mb-4 drop-shadow-md">🎉 今日發財號碼 🎉</div>
-                <div class="text-white text-9xl font-black italic tracking-tighter" style="text-shadow: 0 0 20px #fbbf24, 6px 6px 0px #450a0a;">
+                <div class="text-yellow-400 text-lg font-black mb-2 drop-shadow-md">🎉 今日發財號碼 🎉</div>
+                <div class="text-white text-6xl font-black italic tracking-tighter" style="text-shadow: 0 0 15px #fbbf24, 4px 4px 0px #450a0a;">
                     ${luckyNum}
                 </div>
             `;
