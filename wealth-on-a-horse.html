@@ -6,7 +6,7 @@
     <title>馬上有錢！ (Wealth on a horse!)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tone.js (Version 14.7.77) -->
+    <!-- Tone.js (Only used for the dull 'thud' kick sound, no melodies) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
@@ -377,145 +377,60 @@
         let isFlattened = false;
         let hasUploaded = false;
 
-        // --- 1. SETUP AUDIO OBJECTS (MP3) ---
+        // --- 1. SETUP AUDIO ---
         
-        // Essential: Horse Neigh Sound
+        // A. The Horse Sound
         const horseAudio = new Audio('https://www.google.com/logos/fnbx/animal_sounds/horse.mp3');
         
-        // Essential: CNY Music (Primary & Backup)
-        const primaryMusicUrl = 'viacheslavstarostin-chinese-lunar-new-year-465871.mp3'; // User's File
-        // Backup: A standard CNY Festive Loop (Royalty free source)
+        // B. The CNY Music (Main & Backup)
+        // 1. Try your specific file first
+        const userMusicFile = 'viacheslavstarostin-chinese-lunar-new-year-465871.mp3';
+        // 2. Fallback to this Real MP3 (Not Tone.js) if local file is missing
         const backupMusicUrl = 'https://raw.githubusercontent.com/sk2589822/Exams/master/audio/chunjie.mp3'; 
-        
-        const cnyMusic = new Audio(primaryMusicUrl);
-        let musicAttempts = 0;
 
-        // Logic Chain: Horse Ends -> Play Music
-        horseAudio.addEventListener('ended', () => {
-            console.log("Horse sound ended. Playing CNY music...");
-            cnyMusic.currentTime = 0;
-            cnyMusic.volume = 1.0;
+        const cnyMusic = new Audio();
+        // Pre-set to user file, but don't load yet
+        cnyMusic.src = userMusicFile;
+
+        // Logic: Wait for Horse to finish, THEN play music
+        horseAudio.onended = () => {
+            console.log("Horse finished. Now playing music.");
             
-            const p = cnyMusic.play();
+            // Try playing the current src (defaults to user file)
+            let p = cnyMusic.play();
+            
             if (p !== undefined) {
                 p.catch(error => {
-                    console.warn("User's MP3 not found. Trying backup online source...");
-                    // Try backup URL
-                    if (musicAttempts === 0) {
-                        cnyMusic.src = backupMusicUrl;
-                        musicAttempts++;
-                        cnyMusic.play().catch(e => {
-                            console.warn("Backup URL failed. Starting Digital Orchestra.");
-                            playImpressiveOrchestra();
-                        });
-                    } else {
-                        playImpressiveOrchestra();
-                    }
+                    console.log("User file failed/missing. Switching to Backup MP3.");
+                    // Switch to backup URL immediately
+                    cnyMusic.src = backupMusicUrl;
+                    cnyMusic.load();
+                    cnyMusic.play();
                 });
             }
-        });
+        };
 
-        // Error handling for CNY Music
-        cnyMusic.addEventListener('error', (e) => {
-            console.warn("Music file error. Switching to Digital Orchestra.");
-            if (musicAttempts === 0) {
-                // Try backup once
+        // If the audio tag itself throws an error (e.g. 404), switch to backup
+        cnyMusic.onerror = () => {
+            console.log("Audio error detected. Switching to backup.");
+            if (cnyMusic.src.indexOf(backupMusicUrl) === -1) {
                 cnyMusic.src = backupMusicUrl;
-                musicAttempts++;
                 cnyMusic.load();
-                cnyMusic.play().catch(() => playImpressiveOrchestra());
-            } else {
-                playImpressiveOrchestra();
+                // We don't play here immediately; we let the play() call handle it or next trigger
             }
-        });
+        };
 
-        // --- 2. TONE.JS "DIGITAL ORCHESTRA" (Impressive Backup) ---
-        // Replacing simple beeps with Suona (Trumpet) and Drums
-        
-        // Kick for impact (Gameplay)
+        // --- 2. SIMPLE KICK SOUND (No Orchestra) ---
+        // Using Tone.js only for a simple "thud" sound on kick
         const kickSynth = new Tone.MembraneSynth({
             pitchDecay: 0.05,
             octaves: 4,
             oscillator: { type: "sine" },
-            envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 },
-            volume: 5
+            envelope: { attack: 0.001, decay: 0.2, sustain: 0.01, release: 0.1 },
+            volume: 10
         }).toDestination();
 
-        // Noise for slap (Gameplay)
-        const impactNoise = new Tone.NoiseSynth({
-            noise: { type: "white" },
-            envelope: { attack: 0.005, decay: 0.1, sustain: 0 },
-            volume: -10
-        }).toDestination();
-
-        // ORCHESTRA INSTRUMENTS
-        // 1. Suona (Lead Instrument - High Pitch Sawtooth)
-        const suonaSynth = new Tone.Synth({
-            oscillator: { type: "sawtooth" },
-            envelope: { attack: 0.01, decay: 0.1, sustain: 0.3, release: 0.1 },
-            volume: -8
-        }).toDestination();
-
-        // 2. Cymbals (Metallic)
-        const cymbalSynth = new Tone.MetalSynth({
-            frequency: 200, envelope: { attack: 0.001, decay: 0.1, release: 0.01 },
-            harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5,
-            volume: -15
-        }).toDestination();
-
-        // The "Impressive" Gong Xi Fa Cai Generator
-        const playImpressiveOrchestra = async () => {
-            await Tone.start();
-            Tone.Transport.stop();
-            Tone.Transport.cancel();
-            
-            // Tempo: Fast and Festive
-            Tone.Transport.bpm.value = 140;
-
-            // Melody: Gong Xi Gong Xi (Pentatonic)
-            // A4=La, C5=Do, D5=Re, E5=Mi, G4=Sol
-            const melody = [
-                // Gong Xi Gong Xi (A A A - G E G D)
-                { time: "0:0:0", note: "A4", dur: "4n" }, { time: "0:1:0", note: "A4", dur: "4n" }, { time: "0:2:0", note: "A4", dur: "2n" },
-                { time: "1:0:0", note: "G4", dur: "4n" }, { time: "1:1:0", note: "E4", dur: "4n" }, { time: "1:2:0", note: "G4", dur: "4n" }, { time: "1:3:0", note: "D4", dur: "4n" },
-                
-                // Gong Xi (E A)
-                { time: "2:0:0", note: "E4", dur: "4n" }, { time: "2:1:0", note: "A4", dur: "2n" },
-                
-                // Gong Xi Ni Ya (E D C D E)
-                { time: "3:0:0", note: "E4", dur: "4n" }, { time: "3:1:0", note: "D4", dur: "8n" }, { time: "3:1:2", note: "C4", dur: "8n" },
-                { time: "3:2:0", note: "D4", dur: "4n" }, { time: "3:3:0", note: "E4", dur: "4n" }
-            ];
-
-            // Percussion Loop (Dong Dong Dong Qiang)
-            const percussion = [
-                { time: "0:0:0", type: "kick" }, { time: "0:1:0", type: "kick" }, { time: "0:2:0", type: "kick" }, { time: "0:3:0", type: "crash" },
-                { time: "1:0:0", type: "kick" }, { time: "1:1:0", type: "kick" }, { time: "1:2:0", type: "kick" }, { time: "1:3:0", type: "crash" },
-                { time: "2:0:0", type: "kick" }, { time: "2:1:0", type: "kick" }, { time: "2:2:0", type: "kick" }, { time: "2:3:0", type: "crash" },
-                { time: "3:0:0", type: "kick" }, { time: "3:1:0", type: "kick" }, { time: "3:2:0", type: "kick" }, { time: "3:3:0", type: "crash" }
-            ];
-
-            // Schedule Melody
-            const melodyPart = new Tone.Part((time, value) => {
-                suonaSynth.triggerAttackRelease(value.note, value.dur, time);
-            }, melody).start(0);
-
-            // Schedule Percussion
-            const drumPart = new Tone.Part((time, value) => {
-                if (value.type === "kick") {
-                    kickSynth.triggerAttackRelease("C2", "8n", time);
-                } else {
-                    cymbalSynth.triggerAttackRelease(time);
-                }
-            }, percussion).start(0);
-
-            melodyPart.loop = false;
-            drumPart.loop = false; // Play once per trigger or loop if desired
-            
-            Tone.Transport.start();
-        };
-
-        // --- 3. GAME LOGIC ---
+        // --- 3. VISUALS ---
 
         const horseEmojis = ['🐴', '🎠', '🏇', '🐎', '🦓', '🦄', '🐎', '🐴'];
         for (let i = 0; i < 60; i++) {
@@ -532,10 +447,8 @@
         const unlockAudio = async () => {
             if (!isSoundReady) {
                 await Tone.start();
-                kickSynth.triggerAttackRelease("C2", "64n"); // Silent trigger
-                // Pre-load audio
-                horseAudio.load();
-                cnyMusic.load();
+                kickSynth.triggerAttackRelease("C2", "64n"); // Silent unlock
+                horseAudio.load(); // Preload horse
                 isSoundReady = true;
             }
         };
@@ -566,13 +479,11 @@
             const x = e.clientX || (e.touches && e.touches[0].clientX);
             const y = e.clientY || (e.touches && e.touches[0].clientY);
 
+            // --- HIT LOGIC ---
             if (hitCount % 50 === 0) {
-                // --- BIG HIT EVENT ---
-                
-                // 1. Play Horse (Google)
+                // BIG HIT: Only play Horse. Music follows automatically via 'onended'
                 horseAudio.currentTime = 0;
-                horseAudio.play().catch(e => console.error("Horse audio failed:", e));
-                // Note: The logic to play CNY music is in the 'ended' listener of horseAudio
+                horseAudio.play().catch(e => console.error("Horse failed:", e));
 
                 triggerHaptic(true);
 
@@ -591,22 +502,22 @@
                     dizzyStars.classList.remove('active');
                     isFlattened = false;
                     printsLayer.innerHTML = '';
-                    // Stop Music
+                    
+                    // Reset Music
                     cnyMusic.pause();
                     cnyMusic.currentTime = 0;
-                    Tone.Transport.stop();
                 }, 7000);
+
             } else {
-                // --- SMALL HIT EVENT ---
+                // SMALL HIT: Just the thud sound
                 if(isSoundReady) {
-                    const now = Tone.now();
-                    kickSynth.triggerAttackRelease("C2", "8n", now);
-                    impactNoise.triggerAttackRelease("32n", now);
+                    // This is NOT the orchestra. Just a drum kick.
+                    kickSynth.triggerAttackRelease("C2", "8n");
                 }
                 triggerHaptic(false);
             }
 
-            // Visual Animations
+            // Animations
             const frame = document.getElementById('villain-image-wrapper');
             frame.classList.remove('shake-active');
             void frame.offsetWidth; 
@@ -736,7 +647,6 @@
             horseAudio.currentTime = 0;
             cnyMusic.pause();
             cnyMusic.currentTime = 0;
-            Tone.Transport.stop();
         });
 
         window.addEventListener('mousedown', handleHit);
