@@ -6,7 +6,7 @@
     <title>馬上有錢！ (Wealth on a horse!)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tone.js for Audio Synthesis -->
+    <!-- Tone.js (Used for sound effects and backup music if MP3 fails) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
             display: flex;
             flex-direction: column;
             margin: 0;
-            user-select: none; /* Prevent text selection */
+            user-select: none;
         }
 
         .bg-emoji {
@@ -296,9 +296,7 @@
             <p class="text-red-300 text-lg font-bold"># 蹄到你懷疑人生 #</p>
         </div>
 
-        <!-- Villain Container -->
         <div id="villain-container">
-            <!-- Stars Effect -->
             <div id="dizzy-stars" class="dizzy-stars-container">
                 <div class="stars-orbit">
                     <div class="dizzy-star">⭐</div>
@@ -307,24 +305,19 @@
                 </div>
             </div>
 
-            <!-- Image Frame -->
             <div id="villain-image-wrapper" class="villain-frame">
-                <!-- Default Placeholder Image -->
                 <img id="villain-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTEwIiByPSI3MCIgZmlsbD0iI2I0NWYwNiIvPgogIDxjaXJjbGUgY3g9Ijc1IiBjeT0iOTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEyNSIgY3k9Ijk1IiByPSIyMCIgZmlsbD0id2hpdGUiLz4KICA8cGF0aCBkPSJNNzAgMTM1IEMgODAgMTUwLCAxMjAgMTUwLCAxMzAgMTM1IiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=" class="w-full h-full object-cover">
                 <div id="image-overlay-hint" class="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
                     <span class="text-white font-bold text-sm bg-red-600 px-3 py-1 rounded-full border border-yellow-400">鎖定小人對象</span>
                 </div>
-                <!-- Horseshoe Prints Layer -->
                 <div id="prints-layer" class="absolute inset-0 pointer-events-none"></div>
             </div>
 
-            <!-- Tag -->
             <div class="villain-tag bg-yellow-500 text-red-950 px-5 py-1 rounded-full text-xl font-black shadow-xl border-2 border-red-950">
                 此人欠踢
             </div>
         </div>
 
-        <!-- Buttons -->
         <div class="flex flex-row gap-4 px-4 w-full max-w-md justify-center mt-4">
             <label for="upload-input" class="btn-game bg-yellow-500 text-red-950 flex-1 flex items-center justify-center cursor-pointer shadow-[0_0_20px_rgba(251,191,36,0.5)]">
                 上傳欠踢照
@@ -335,7 +328,6 @@
             <input type="file" id="upload-input" class="hidden" accept="image/*">
         </div>
 
-        <!-- Counter -->
         <div class="counter-box mt-4">
             <div class="text-yellow-500 text-xs font-black uppercase tracking-widest mb-1">馬腳功德榜</div>
             <div class="text-4xl md:text-5xl font-black text-yellow-400">
@@ -354,7 +346,6 @@
         </div>
     </footer>
 
-    <!-- Hidden Assets -->
     <svg id="tool-svg" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
         <path d="M20,30 C20,10 80,10 80,30 L80,70 C80,85 65,95 50,95 C35,95 20,85 20,70 Z" fill="none" stroke="#fbbf24" stroke-width="12" stroke-linecap="round"/>
         <path d="M35,30 C35,20 65,20 65,30 L65,70 C65,78 58,83 50,83 C42,83 35,78 35,70 Z" fill="none" stroke="#450a0a" stroke-width="2" stroke-linecap="round"/>
@@ -386,18 +377,40 @@
         let isFlattened = false;
         let hasUploaded = false;
 
-        // --- AUDIO CONFIGURATION ---
+        // --- 1. SETUP AUDIO OBJECTS ---
+        
+        // Essential: Horse Neigh Sound (Google Source)
+        const horseAudio = new Audio('https://www.google.com/logos/fnbx/animal_sounds/horse.mp3');
+        
+        // Essential: CNY Music (User Logic)
+        const cnyMusic = new Audio('viacheslavstarostin-chinese-lunar-new-year-465871.mp3');
 
-        // 1. Horse Sounds (Stable Google URL)
-        const horseUrl = 'https://actions.google.com/sounds/v1/animals/horse_neigh.ogg';
-        const luckyHorseAudio = new Audio();
+        // Logic Chain: When horse sound ends, play CNY music
+        horseAudio.addEventListener('ended', () => {
+            console.log("Horse sound ended. Playing CNY music...");
+            cnyMusic.currentTime = 0;
+            cnyMusic.volume = 1.0;
+            
+            // Attempt to play user's file
+            const playPromise = cnyMusic.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.warn("User's MP3 file failed (likely missing). Playing backup synth.");
+                    playBackupMelody(); // Fallback to synth if file is missing
+                });
+            }
+        });
+
+        // Error handling for CNY Music (e.g. 404 Not Found)
+        cnyMusic.addEventListener('error', (e) => {
+            console.warn("CNY Music file error/not found. Using Synth backup.");
+            playBackupMelody();
+        });
+
+        // --- 2. TONE.JS SETUP (SFX & Backup Music) ---
         
-        // Load Horse Sound safely
-        luckyHorseAudio.src = horseUrl;
-        luckyHorseAudio.load();
-        
-        // 2. Synthesizer Setup (Tone.js)
-        // Kick for impact (Low frequency)
+        // Kick for impact
         const kickSynth = new Tone.MembraneSynth({
             pitchDecay: 0.05,
             octaves: 4,
@@ -406,19 +419,15 @@
             volume: 10
         }).toDestination();
 
-        // Noise for slap (White noise)
+        // Noise for slap
         const impactNoise = new Tone.NoiseSynth({
             noise: { type: "white" },
             envelope: { attack: 0.005, decay: 0.1, sustain: 0 },
             volume: -5
         }).toDestination();
 
-        // --- THE FIX: Gong Xi Fa Cai Melody ---
-        // Generates the music programmatically so no MP3 file is needed
-        const playCNYMelody = async () => {
-            await Tone.start(); 
-            
-            // Create a Chinese-style instrument (Plucked string sound)
+        // Backup Melody Generator (Gong Xi Fa Cai) - runs ONLY if mp3 fails
+        const playBackupMelody = async () => {
             const koto = new Tone.PolySynth(Tone.Synth, {
                 oscillator: { type: "triangle" },
                 envelope: { attack: 0.05, decay: 0.2, sustain: 0.4, release: 0.8 }
@@ -426,33 +435,25 @@
             koto.volume.value = -2;
 
             const now = Tone.now();
-            const beat = 0.35; // Speed of the song
-
-            // "Gong Xi Fa Cai" Simplified Melody Pattern
+            const beat = 0.35; 
             const melody = [
-                // Gong Xi Gong Xi
                 { note: "A4", time: 0 }, { note: "A4", time: 1 }, 
-                // Gong Xi Ni Ya
                 { note: "A4", time: 2 }, { note: "G4", time: 2.5 }, { note: "E4", time: 3 }, { note: "G4", time: 3.5 }, { note: "D4", time: 4 },
-                // Gong Xi
                 { note: "E4", time: 6 }, { note: "A4", time: 7 },
-                // Gong Xi Ni Ya
                 { note: "E4", time: 8 }, { note: "D4", time: 8.5 }, { note: "C4", time: 9 }, { note: "D4", time: 9.5 }, { note: "E4", time: 10 },
             ];
-
-            // Play the melody
             melody.forEach(m => {
                 koto.triggerAttackRelease(m.note, "4n", now + (m.time * beat));
             });
-
-            // Add a Drum Beat (Dong Dong Dong Qiang)
             const drumLoop = [0, 1, 2, 3, 4, 6, 7, 8, 10];
             drumLoop.forEach(i => {
                 kickSynth.triggerAttackRelease("C2", "8n", now + (i * beat));
             });
         };
 
-        // --- BACKGROUND & VISUALS ---
+        // --- 3. GAME LOGIC ---
+
+        // Background Decor
         const horseEmojis = ['🐴', '🎠', '🏇', '🐎', '🦓', '🦄', '🐎', '🐴'];
         for (let i = 0; i < 60; i++) {
             const span = document.createElement('span');
@@ -468,15 +469,12 @@
         const unlockAudio = async () => {
             if (!isSoundReady) {
                 await Tone.start();
-                // Play silent note to unlock iOS audio
-                kickSynth.triggerAttackRelease("C2", "64n");
+                kickSynth.triggerAttackRelease("C2", "64n"); // Silent trigger
+                // Pre-load audio objects to ensure they are ready
+                horseAudio.load();
+                cnyMusic.load();
                 isSoundReady = true;
             }
-        };
-
-        const playHorseSound = () => {
-             luckyHorseAudio.currentTime = 0;
-             luckyHorseAudio.play().catch(e => console.log("Audio play blocked", e));
         };
 
         const triggerHaptic = (isBigHit = false) => {
@@ -506,8 +504,13 @@
             const y = e.clientY || (e.touches && e.touches[0].clientY);
 
             if (hitCount % 50 === 0) {
-                // --- BIG HIT EVENT ---
-                playHorseSound();
+                // --- BIG HIT EVENT (50th Click) ---
+                
+                // 1. Play Horse Sound (Google URL)
+                horseAudio.currentTime = 0;
+                horseAudio.play().catch(e => console.error("Horse audio failed:", e));
+                // Note: The logic to play CNY music is in the 'ended' event listener above
+
                 triggerHaptic(true);
 
                 isFlattened = true;
@@ -516,9 +519,7 @@
 
                 triggerProsperityRain();
                 
-                // Play the Generated Music
                 setTimeout(() => {
-                    playCNYMelody();
                     showLuckyNumber();
                 }, 500); 
 
@@ -527,6 +528,8 @@
                     dizzyStars.classList.remove('active');
                     isFlattened = false;
                     printsLayer.innerHTML = '';
+                    cnyMusic.pause();
+                    cnyMusic.currentTime = 0;
                 }, 7000);
             } else {
                 // --- SMALL HIT EVENT ---
@@ -538,7 +541,7 @@
                 triggerHaptic(false);
             }
 
-            // Animations (Shake & Print)
+            // Visual Animations
             const frame = document.getElementById('villain-image-wrapper');
             frame.classList.remove('shake-active');
             void frame.offsetWidth; 
@@ -663,6 +666,11 @@
             document.getElementById('villain-image-wrapper').classList.remove('shake-active');
             villainContainer.classList.remove('villain-flattened');
             dizzyStars.classList.remove('active');
+            // Reset Audio
+            horseAudio.pause();
+            horseAudio.currentTime = 0;
+            cnyMusic.pause();
+            cnyMusic.currentTime = 0;
         });
 
         window.addEventListener('mousedown', handleHit);
