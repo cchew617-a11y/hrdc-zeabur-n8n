@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>馬上有錢！ (Wealth on a horse!)</title>
-    <!-- Tailwind CSS (Note: console warning about production use remains, but it's not a functional error) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tone.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
@@ -46,6 +46,7 @@
             padding: 8px 0;
             text-align: center;
             z-index: 50;
+            flex-shrink: 0;
         }
 
         .main-stage {
@@ -53,20 +54,23 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-around;
-            padding: 1rem 0;
+            justify-content: flex-start; /* Changed from space-around to prevent spreading too wide */
+            padding: 10px 0;
             z-index: 10;
+            overflow-y: auto; /* Allow scrolling on very small screens */
         }
 
         #villain-container {
             position: relative;
             width: 240px;
-            height: 280px;
+            height: 260px; /* Slightly reduced height */
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 20;
             overflow: visible;
+            margin-top: 10px;
+            flex-shrink: 0;
         }
 
         .villain-frame {
@@ -88,7 +92,7 @@
 
         .villain-tag {
             position: absolute;
-            bottom: 40px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
@@ -96,18 +100,19 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
+        /* UPDATED: More violent shake animation for visual impact */
         @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+            0% { transform: translate(2px, 2px) rotate(0deg); }
+            10% { transform: translate(-2px, -4px) rotate(-2deg); }
+            20% { transform: translate(-6px, 0px) rotate(2deg); }
+            30% { transform: translate(6px, 4px) rotate(0deg); }
+            40% { transform: translate(2px, -2px) rotate(2deg); }
+            50% { transform: translate(-2px, 4px) rotate(-2deg); }
+            60% { transform: translate(-6px, 2px) rotate(0deg); }
+            70% { transform: translate(6px, 2px) rotate(-2deg); }
+            80% { transform: translate(-2px, -2px) rotate(2deg); }
+            90% { transform: translate(2px, 4px) rotate(0deg); }
+            100% { transform: translate(2px, -4px) rotate(-2deg); }
         }
 
         .shake-active {
@@ -262,18 +267,19 @@
             background: rgba(0, 0, 0, 0.3);
             border: 2px solid #5c1c1c;
             border-radius: 30px;
-            padding: 1rem 2rem;
+            padding: 0.8rem 2rem;
             text-align: center;
         }
 
         @media (max-width: 480px) {
             .villain-frame { width: 160px; height: 160px; }
-            #villain-container { height: 200px; }
+            #villain-container { height: 180px; }
             h1 { font-size: 2.2rem !important; }
+            h2 { font-size: 1.2rem !important; }
             .btn-game { min-width: 110px; padding: 0.7rem; font-size: 0.875rem; }
-            .counter-box { padding: 0.8rem 1.5rem; }
+            .counter-box { padding: 0.6rem 1.5rem; margin-top: 10px; }
             .curse-text { font-size: 1.8rem; }
-            .villain-tag { bottom: 20px; font-size: 1rem; padding: 0.25rem 1rem; }
+            .villain-tag { bottom: 15px; font-size: 1rem; padding: 0.25rem 1rem; }
             .lucky-number-display { min-width: 200px; padding: 10px 15px; }
         }
     </style>
@@ -287,7 +293,7 @@
     </div>
 
     <main id="game-container" class="main-stage cursor-pointer">
-        <div class="text-center px-4">
+        <div class="text-center px-4 mt-2 shrink-0">
             <h1 class="text-5xl md:text-6xl font-black text-yellow-400 tracking-tight drop-shadow-lg">神馬踢飛小人廟</h1>
             <h2 class="text-xl md:text-3xl font-bold text-white italic mt-1">馬上有錢，衰人走遠</h2>
             <p class="text-red-300 text-lg font-bold"># 蹄到你懷疑人生 #</p>
@@ -316,8 +322,7 @@
         </div>
 
         <!-- Buttons Container with High Z-Index -->
-        <div class="flex flex-row gap-4 px-4 w-full max-w-md justify-center mt-4 relative z-[50]">
-            <!-- Changed to Button for reliable click triggering -->
+        <div class="flex flex-row gap-4 px-4 w-full max-w-md justify-center mt-4 relative z-[50] shrink-0">
             <button id="upload-btn" class="btn-game bg-yellow-500 text-red-950 flex-1 flex items-center justify-center cursor-pointer shadow-[0_0_20px_rgba(251,191,36,0.5)]">
                 上傳欠踢照
             </button>
@@ -327,22 +332,23 @@
             <input type="file" id="upload-input" class="hidden" accept="image/*">
         </div>
 
-        <div class="counter-box mt-4">
+        <div class="counter-box mt-4 shrink-0">
             <div class="text-yellow-500 text-xs font-black uppercase tracking-widest mb-1">馬腳功德榜</div>
             <div class="text-4xl md:text-5xl font-black text-yellow-400">
                 已蹄爆：<span id="counter">0</span> 次
             </div>
         </div>
-    </main>
 
-    <footer class="w-full text-center py-4 z-50">
-        <div class="text-yellow-100/60 text-[11px]">免責聲明：本遊戲純屬娛樂，馬蹄之下眾生平等。</div>
-        <div class="mt-2">
-            <a href="https://sites.google.com/view/jason-chew-ai-classroom/home" target="_blank" class="text-yellow-500 text-xs font-bold no-underline">
-                Design By: Jason Chew's AI Classroom
-            </a>
+        <!-- MOVED FOOTER CONTENT HERE: Directly below counter -->
+        <div class="w-full text-center mt-3 pb-6 z-50 shrink-0">
+            <div class="text-yellow-100/60 text-[11px] px-4 leading-tight">免責聲明：本遊戲純屬娛樂，馬蹄之下眾生平等。</div>
+            <div class="mt-2">
+                <a href="https://sites.google.com/view/jason-chew-ai-classroom/home" target="_blank" class="text-yellow-500 text-xs font-bold no-underline">
+                    Design By: Jason Chew's AI Classroom
+                </a>
+            </div>
         </div>
-    </footer>
+    </main>
 
     <svg id="tool-svg" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
         <path d="M20,30 C20,10 80,10 80,30 L80,70 C80,85 65,95 50,95 C35,95 20,85 20,70 Z" fill="none" stroke="#fbbf24" stroke-width="12" stroke-linecap="round"/>
@@ -377,74 +383,52 @@
         let hasUploaded = false;
 
         // --- AUDIO SETUP ---
-        const horseAudio = new Audio('https://www.google.com/logos/fnbx/animal_sounds/horse.mp3'); // This URL seems reliable
-        horseAudio.load(); // Preload audio
+        const horseAudio = new Audio('https://www.google.com/logos/fnbx/animal_sounds/horse.mp3'); 
+        horseAudio.load(); 
 
-        // Assuming this file will be in the same directory as your HTML
         const userMusicFile = 'chinese-lunar-new-year.mp3';
-        // Removed `musicSource` as you no longer want a fallback.
-
         const cnyMusic = new Audio();
         cnyMusic.src = userMusicFile;
-        cnyMusic.volume = 0; // Start at zero
-        cnyMusic.loop = true; // Ensure music loops
-        cnyMusic.load(); // Preload audio
+        cnyMusic.volume = 0; 
+        cnyMusic.loop = true; 
+        cnyMusic.load(); 
 
-        // Modified onerror to only log, not attempt a fallback that doesn't exist
         cnyMusic.onerror = () => {
             console.error(`Failed to load primary music source: ${userMusicFile}. No backup specified.`);
-            // No action taken here as there's no backup.
         };
 
-        // Function to unlock audio context on the first user interaction
         const initAudio = async () => {
             if (isAudioUnlocked) return;
-
             try {
-                // For Web Audio API (Tone.js)
                 await Tone.start();
-                console.log("Tone.js audio context unlocked.");
-
-                // For HTML5 Audio elements
-                // Attempt to play and pause both horseAudio and cnyMusic to "bless" them
                 await horseAudio.play();
                 horseAudio.pause();
-                horseAudio.currentTime = 0; // Reset for actual playback
+                horseAudio.currentTime = 0;
 
-                // Only attempt to play cnyMusic if it has a valid source
-                if (cnyMusic.src && cnyMusic.src !== window.location.href) { // check if src is set and not pointing to current page
+                if (cnyMusic.src && cnyMusic.src !== window.location.href) { 
                     await cnyMusic.play();
                     cnyMusic.pause();
-                    cnyMusic.currentTime = 0; // Reset for actual playback
+                    cnyMusic.currentTime = 0; 
                 }
 
-                // A tiny silent audio element as a fallback for extreme cases (still good to keep)
                 const silentAudio = new Audio();
                 silentAudio.src = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU1UAAAAPAAADTGF2ZjU4LjM1LjEwMAAAAAAAAAAAAAAA//tAxAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVFRTbm9uZQAAAAAAAAAAAAAA//sAwgAAAZAAAADkAAAEhGVwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD/7AMAwAEABQAAAAAUAAADsQAAAAMAAgAAAEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABTbm9uZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/7ADo0ABlFAAAAQAAAOQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
                 silentAudio.volume = 0;
                 await silentAudio.play();
                 silentAudio.pause();
-                silentAudio.remove(); // Clean up
+                silentAudio.remove();
 
                 isAudioUnlocked = true;
-                console.log("All audio initialized successfully!");
-
-                // Remove the event listeners after successful initialization
                 document.body.removeEventListener('click', initAudio, { capture: true });
                 document.body.removeEventListener('touchstart', initAudio, { capture: true });
-
             } catch (e) {
                 console.error("Failed to initialize audio:", e);
-                // Even if there's an error, mark as unlocked to prevent repeated attempts
                 isAudioUnlocked = true;
             }
         };
 
-        // Attach the initAudio function to the first mousedown/touchstart event on the *document body*
-        // Use capture: true to ensure it fires as early as possible in the event phase
         document.body.addEventListener('click', initAudio, { once: true, capture: true });
         document.body.addEventListener('touchstart', initAudio, { once: true, capture: true });
-
 
         // --- UPLOAD HANDLER ---
         uploadBtn.addEventListener('click', (e) => {
@@ -479,22 +463,27 @@
             volume: 10
         }).toDestination();
 
+        // UPDATED HAPTIC LOGIC: Increased intensity
         const triggerHaptic = (isBigHit = false) => {
             if (navigator.vibrate) {
-                try { isBigHit ? navigator.vibrate([200, 100, 200]) : navigator.vibrate(50); } catch(e) {}
+                try { 
+                    if (isBigHit) {
+                        // Aggressive pattern: Vibrate, pause, vibrate, pause, long vibrate
+                        navigator.vibrate([500, 50, 500, 50, 1000]); 
+                    } else {
+                        // Stronger single tap (200ms instead of 50ms)
+                        navigator.vibrate(200); 
+                    }
+                } catch(e) {}
             }
         };
 
         const handleHit = async (e) => {
-            if (e.target.closest('button') || e.target.closest('input')) return;
+            if (e.target.closest('button') || e.target.closest('input') || e.target.closest('a')) return;
 
-            // Ensure audio is initialized on first *gameplay* interaction if it somehow wasn't before
             if (!isAudioUnlocked) {
-                 await initAudio(); // Await to ensure context is ready
-                 if (!isAudioUnlocked) { // If still not unlocked after attempt, prevent play
-                     console.warn("Audio not unlocked, preventing hit sound.");
-                     return;
-                 }
+                 await initAudio(); 
+                 if (!isAudioUnlocked) return;
             }
 
             if (!hasUploaded) {
@@ -512,28 +501,21 @@
 
             if (hitCount % 50 === 0) {
                 // --- BIG HIT ---
-                horseAudio.currentTime = 0; // Reset to start
-                horseAudio.play().catch(e => console.error("Horse audio failed to play:", e));
+                horseAudio.currentTime = 0;
+                horseAudio.play().catch(e => console.error("Horse audio failed:", e));
 
-                // Only play cnyMusic if it has a valid source and is unlocked
                 if (cnyMusic.src && cnyMusic.src !== window.location.href) {
-                    cnyMusic.currentTime = 0; // Ensure music starts from beginning
-                    cnyMusic.play().catch(e => {
-                        console.error("CNY music failed to play:", e);
-                    });
-                } else {
-                    console.warn("CNY music source is not set or invalid, skipping playback.");
+                    cnyMusic.currentTime = 0;
+                    cnyMusic.play().catch(e => console.error("CNY music failed:", e));
                 }
 
-                // Smoothly ramp up the music volume after the horse sound
                 setTimeout(() => {
                     if (isAudioUnlocked) {
-                        cnyMusic.volume = 0.8; // Set desired volume
+                        cnyMusic.volume = 0.8;
                     }
-                }, 1300); // Adjust timing based on horse audio duration
+                }, 1300);
 
-
-                triggerHaptic(true);
+                triggerHaptic(true); // Trigger big vibration
                 isFlattened = true;
                 villainContainer.classList.add('villain-flattened');
                 dizzyStars.classList.add('active');
@@ -547,15 +529,15 @@
                     printsLayer.innerHTML = '';
                     cnyMusic.pause();
                     cnyMusic.currentTime = 0;
-                    cnyMusic.volume = 0; // Reset volume for next play
+                    cnyMusic.volume = 0; 
                 }, 7000);
             } else {
                 // --- SMALL HIT ---
                 if (Tone.context.state !== 'running') {
-                    await Tone.start().catch(e => console.error("Tone.start failed in small hit:", e));
+                    await Tone.start().catch(e => console.error("Tone.start failed:", e));
                 }
                 kickSynth.triggerAttackRelease("C2", "8n");
-                triggerHaptic(false);
+                triggerHaptic(false); // Trigger stronger small vibration
             }
 
             const frame = document.getElementById('villain-image-wrapper');
@@ -667,30 +649,26 @@
             villainContainer.classList.remove('villain-flattened');
             dizzyStars.classList.remove('active');
             
-            // Ensure audio is fully stopped and reset
             horseAudio.pause();
             horseAudio.currentTime = 0;
             cnyMusic.pause();
             cnyMusic.currentTime = 0;
-            cnyMusic.volume = 0; // Reset music volume
+            cnyMusic.volume = 0; 
             
-            // If Tone.js context is running, suspend it
             if (Tone.context.state === 'running') {
                 await Tone.context.suspend();
             }
-            // Reset audio unlocked state for a fresh start after reset, if user clicks again
             isAudioUnlocked = false; 
             document.body.addEventListener('click', initAudio, { once: true, capture: true });
             document.body.addEventListener('touchstart', initAudio, { once: true, capture: true });
         });
 
-        // Use the handleHit function directly for game interactions
         window.addEventListener('mousedown', handleHit);
         window.addEventListener('touchstart', (e) => {
-            if (e.target.closest('button') || e.target.closest('input')) return;
-            e.preventDefault(); // Prevent default touch behavior (e.g., scrolling)
+            if (e.target.closest('button') || e.target.closest('input') || e.target.closest('a')) return;
+            e.preventDefault(); 
             handleHit(e);
-        }, { passive: false }); // passive: false to allow preventDefault
+        }, { passive: false });
     </script>
 </body>
 </html>
