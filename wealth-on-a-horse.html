@@ -60,13 +60,13 @@
 
         #villain-container {
             position: relative;
-            width: 240px; 
-            height: 280px; 
+            width: 240px;
+            height: 280px;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 20;
-            overflow: visible; 
+            overflow: visible;
         }
 
         .villain-frame {
@@ -81,17 +81,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden; 
-            z-index: 10; 
+            overflow: hidden;
+            z-index: 10;
             transition: transform 0.1s;
         }
 
         .villain-tag {
             position: absolute;
-            bottom: 40px; 
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1000; 
+            z-index: 1000;
             white-space: nowrap;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
@@ -116,18 +116,18 @@
 
         .dizzy-stars-container {
             position: absolute;
-            top: -50px; 
+            top: -50px;
             left: 50%;
             transform: translateX(-50%);
             width: 160px;
             height: 80px;
             pointer-events: none;
-            z-index: 200; 
+            z-index: 200;
             opacity: 0;
             transition: opacity 0.2s;
-            display: none; 
+            display: none;
         }
-        
+
         .dizzy-stars-container.active {
             opacity: 1;
             display: block;
@@ -151,14 +151,14 @@
             color: #fbbf24;
             filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
         }
-        
+
         .dizzy-star:nth-child(1) { top: 10%; left: 50%; transform: translate(-50%, -50%); }
         .dizzy-star:nth-child(2) { bottom: 10%; left: 0; transform: translate(-50%, 50%); }
         .dizzy-star:nth-child(3) { bottom: 10%; right: 0; transform: translate(50%, 50%); }
 
         .tool {
             position: absolute;
-            width: 140px; 
+            width: 140px;
             height: 140px;
             pointer-events: none;
             transform-origin: center;
@@ -168,459 +168,3 @@
         .hit-animation {
             animation: horse-stamp 0.2s ease-out forwards;
         }
-        @keyframes horse-stamp {
-            0% { transform: translate(-50%, -120%) scale(1.8); opacity: 0.5; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-            100% { transform: translate(-50%, -45%) scale(1); opacity: 0; }
-        }
-
-        .horseshoe-print {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            pointer-events: none;
-            opacity: 0.4;
-            z-index: 40;
-            animation: fade-out-print 5s ease-in forwards;
-        }
-        @keyframes fade-out-print {
-            0% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-        }
-
-        .curse-text {
-            position: absolute;
-            pointer-events: none;
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #fef08a; 
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
-            z-index: 200;
-            white-space: nowrap;
-            animation: curse-burst-anim 1s forwards;
-        }
-        @keyframes curse-burst-anim {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            20% { opacity: 1; }
-            100% { transform: translate(calc(-50% + var(--tx-end)), calc(-50% + var(--ty-end))) scale(1); opacity: 0; }
-        }
-
-        .lucky-number-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 500; 
-            pointer-events: none;
-            text-align: center;
-            width: fit-content;
-            min-width: 250px; 
-            max-width: 90%;
-            padding: 15px 25px; 
-            background: rgba(40, 0, 0, 0.98); 
-            border: 4px solid #fbbf24; 
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            animation: lucky-pop 6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            white-space: nowrap; 
-        }
-        @keyframes lucky-pop {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            10% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, -60%) scale(1.1); opacity: 0; }
-        }
-
-        .villain-flattened .villain-frame {
-            transform: scale(1.2, 0.5) translateY(60px);
-        }
-
-        .confetti {
-            position: absolute;
-            z-index: 150;
-            pointer-events: none;
-            animation: confetti-fall 5s linear forwards;
-            white-space: nowrap;
-            font-weight: 900;
-        }
-        @keyframes confetti-fall {
-            0% { transform: translateY(-10vh) rotate(0); opacity: 1; }
-            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-        }
-
-        .btn-game {
-            border-radius: 20px;
-            font-weight: 900;
-            padding: 1rem 1.5rem;
-            transition: transform 0.1s;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-            min-width: 140px;
-        }
-        .btn-game:active { transform: translateY(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-
-        .counter-box {
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px solid #5c1c1c;
-            border-radius: 30px;
-            padding: 1rem 2rem;
-            text-align: center;
-        }
-
-        @media (max-width: 480px) {
-            .villain-frame { width: 160px; height: 160px; }
-            #villain-container { height: 200px; } 
-            h1 { font-size: 2.2rem !important; }
-            .btn-game { min-width: 110px; padding: 0.7rem; font-size: 0.875rem; }
-            .counter-box { padding: 0.8rem 1.5rem; }
-            .curse-text { font-size: 1.8rem; }
-            .villain-tag { bottom: 20px; font-size: 1rem; padding: 0.25rem 1rem; }
-            .lucky-number-display { min-width: 200px; padding: 10px 15px; }
-        }
-    </style>
-</head>
-<body class="relative">
-
-    <div id="emoji-background"></div>
-
-    <div class="header-banner">
-        <div class="text-yellow-400 text-sm md:text-lg font-black tracking-widest">2026 丙午年 · 馬力噴發 · 衰氣蒸發</div>
-    </div>
-
-    <main id="game-container" class="main-stage cursor-pointer">
-        <div class="text-center px-4">
-            <h1 class="text-5xl md:text-6xl font-black text-yellow-400 tracking-tight drop-shadow-lg">神馬踢飛小人廟</h1>
-            <h2 class="text-xl md:text-3xl font-bold text-white italic mt-1">馬上有錢，衰人走遠</h2>
-            <p class="text-red-300 text-lg font-bold"># 蹄到你懷疑人生 #</p>
-        </div>
-
-        <div id="villain-container">
-            <div id="dizzy-stars" class="dizzy-stars-container">
-                <div class="stars-orbit">
-                    <div class="dizzy-star">⭐</div>
-                    <div class="dizzy-star">⭐</div>
-                    <div class="dizzy-star">⭐</div>
-                </div>
-            </div>
-
-            <div id="villain-image-wrapper" class="villain-frame">
-                <img id="villain-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTEwIiByPSI3MCIgZmlsbD0iI2I0NWYwNiIvPgogIDxjaXJjbGUgY3g9Ijc1IiBjeT0iOTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEyNSIgY3k9Ijk1IiByPSIyMCIgZmlsbD0id2hpdGUiLz4KICA8cGF0aCBkPSJNNzAgMTM1IEMgODAgMTUwLCAxMjAgMTUwLCAxMzAgMTM1IiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=" class="w-full h-full object-cover">
-                <div id="image-overlay-hint" class="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
-                    <span class="text-white font-bold text-sm bg-red-600 px-3 py-1 rounded-full border border-yellow-400">鎖定小人對象</span>
-                </div>
-                <div id="prints-layer" class="absolute inset-0 pointer-events-none"></div>
-            </div>
-
-            <div class="villain-tag bg-yellow-500 text-red-950 px-5 py-1 rounded-full text-xl font-black shadow-xl border-2 border-red-950">
-                此人欠踢
-            </div>
-        </div>
-
-        <!-- Buttons Container with High Z-Index -->
-        <div class="flex flex-row gap-4 px-4 w-full max-w-md justify-center mt-4 relative z-[50]">
-            <!-- Changed to Button for reliable click triggering -->
-            <button id="upload-btn" class="btn-game bg-yellow-500 text-red-950 flex-1 flex items-center justify-center cursor-pointer shadow-[0_0_20px_rgba(251,191,36,0.5)]">
-                上傳欠踢照
-            </button>
-            <button id="reset-button" class="btn-game bg-red-700 text-yellow-400 border-2 border-yellow-500 flex-1">
-                蹄下留情
-            </button>
-            <input type="file" id="upload-input" class="hidden" accept="image/*">
-        </div>
-
-        <div class="counter-box mt-4">
-            <div class="text-yellow-500 text-xs font-black uppercase tracking-widest mb-1">馬腳功德榜</div>
-            <div class="text-4xl md:text-5xl font-black text-yellow-400">
-                已蹄爆：<span id="counter">0</span> 次
-            </div>
-        </div>
-    </main>
-
-    <footer class="w-full text-center py-4 z-50">
-        <div class="text-yellow-100/60 text-[11px]">免責聲明：本遊戲純屬娛樂，馬蹄之下眾生平等。</div>
-        <div class="mt-2">
-            <a href="https://sites.google.com/view/jason-chew-ai-classroom/home" target="_blank" class="text-yellow-500 text-xs font-bold no-underline">
-                Design By: Jason Chew's AI Classroom
-            </a>
-        </div>
-    </footer>
-
-    <svg id="tool-svg" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-        <path d="M20,30 C20,10 80,10 80,30 L80,70 C80,85 65,95 50,95 C35,95 20,85 20,70 Z" fill="none" stroke="#fbbf24" stroke-width="12" stroke-linecap="round"/>
-        <path d="M35,30 C35,20 65,20 65,30 L65,70 C65,78 58,83 50,83 C42,83 35,78 35,70 Z" fill="none" stroke="#450a0a" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="30" cy="40" r="3" fill="#450a0a" /><circle cx="30" cy="55" r="3" fill="#450a0a" /><circle cx="30" cy="70" r="3" fill="#450a0a" />
-        <circle cx="70" cy="40" r="3" fill="#450a0a" /><circle cx="70" cy="55" r="3" fill="#450a0a" /><circle cx="70" cy="70" r="3" fill="#450a0a" />
-    </svg>
-
-    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-900 text-yellow-400 px-8 py-5 rounded-3xl z-[999] opacity-0 pointer-events-none transition-opacity duration-300 shadow-2xl border-4 border-yellow-500 text-center font-bold">
-        <div class="text-2xl mb-1">🐴 蹄不虛發！</div>
-        <div class="text-white">請先上傳小人照片<br>再進行正義的馬踢！</div>
-    </div>
-
-    <script>
-        const gameContainer = document.getElementById('game-container');
-        const villainContainer = document.getElementById('villain-container');
-        const villainImage = document.getElementById('villain-image');
-        const printsLayer = document.getElementById('prints-layer');
-        const uploadInput = document.getElementById('upload-input');
-        const uploadBtn = document.getElementById('upload-btn');
-        const counter = document.getElementById('counter');
-        const toolTemplate = document.getElementById('tool-svg');
-        const resetButton = document.getElementById('reset-button');
-        const toast = document.getElementById('toast');
-        const emojiBg = document.getElementById('emoji-background');
-        const dizzyStars = document.getElementById('dizzy-stars');
-        const defaultVillainSrc = villainImage.src;
-
-        let hitCount = 0;
-        let isAudioUnlocked = false;
-        let isFlattened = false;
-        let hasUploaded = false;
-
-        // --- AUDIO SETUP ---
-        const horseAudio = new Audio('https://www.google.com/logos/fnbx/animal_sounds/horse.mp3');
-        const userMusicFile = 'viacheslavstarostin-chinese-lunar-new-year-465871.mp3';
-        const musicSource = 'https://raw.githubusercontent.com/pe601/mp3/master/GongXiFaCai.mp3';
-        
-        const cnyMusic = new Audio();
-        cnyMusic.src = userMusicFile;
-        cnyMusic.volume = 1.0;
-
-        cnyMusic.onerror = () => {
-            if (cnyMusic.src !== musicSource) {
-                console.log("Switching to backup music...");
-                cnyMusic.src = musicSource;
-            }
-        };
-
-        const blessAudioSystem = () => {
-            if (!isAudioUnlocked) {
-                // Warm up both tracks
-                cnyMusic.play().then(() => { cnyMusic.pause(); cnyMusic.currentTime = 0; }).catch(e => {});
-                horseAudio.load();
-                isAudioUnlocked = true;
-            }
-        };
-
-        // --- UPLOAD HANDLER ---
-        // Explicit click handler for the button to open file dialog
-        uploadBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Stop game click
-            uploadInput.click(); // Open file dialog
-        });
-
-        uploadInput.addEventListener('click', (e) => e.stopPropagation()); // Stop input click from bubbling
-
-        uploadInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    villainImage.src = e.target.result;
-                    hasUploaded = true;
-                    hitCount = 0;
-                    counter.innerText = '0';
-                    printsLayer.innerHTML = '';
-                    document.getElementById('image-overlay-hint').classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // --- GAMEPLAY HANDLER ---
-        const kickSynth = new Tone.MembraneSynth({
-            pitchDecay: 0.05,
-            octaves: 4,
-            oscillator: { type: "sine" },
-            envelope: { attack: 0.001, decay: 0.2, sustain: 0.01, release: 0.1 },
-            volume: 10
-        }).toDestination();
-
-        const triggerHaptic = (isBigHit = false) => {
-            if (navigator.vibrate) {
-                try { isBigHit ? navigator.vibrate([200, 100, 200]) : navigator.vibrate(50); } catch(e) {}
-            }
-        };
-
-        const handleHit = (e) => {
-            if (e.target.closest('button') || e.target.closest('input')) return;
-            
-            blessAudioSystem();
-
-            if (!hasUploaded) {
-                toast.style.opacity = '1';
-                setTimeout(() => toast.style.opacity = '0', 1500);
-                return;
-            }
-            if (isFlattened) return;
-            
-            hitCount++;
-            counter.innerText = hitCount;
-
-            const x = e.clientX || (e.touches && e.touches[0].clientX);
-            const y = e.clientY || (e.touches && e.touches[0].clientY);
-
-            if (hitCount % 50 === 0) {
-                // --- BIG HIT ---
-                horseAudio.currentTime = 0;
-                horseAudio.play().catch(e => console.error(e));
-
-                // START MUSIC SILENTLY NOW (Zero-Volume Start)
-                // This guarantees browsers won't block it later
-                cnyMusic.volume = 0;
-                cnyMusic.currentTime = 0;
-                cnyMusic.play().catch(e => {
-                    // If play failed, ensure we try backup
-                    cnyMusic.src = musicSource;
-                    cnyMusic.play(); 
-                });
-
-                // Unmute music exactly when horse ends (approx 1.2s)
-                setTimeout(() => {
-                    cnyMusic.currentTime = 0;
-                    cnyMusic.volume = 1.0;
-                }, 1300);
-                
-                triggerHaptic(true);
-                isFlattened = true;
-                villainContainer.classList.add('villain-flattened');
-                dizzyStars.classList.add('active'); 
-                triggerProsperityRain();
-                setTimeout(() => showLuckyNumber(), 500); 
-
-                setTimeout(() => {
-                    villainContainer.classList.remove('villain-flattened');
-                    dizzyStars.classList.remove('active');
-                    isFlattened = false;
-                    printsLayer.innerHTML = '';
-                    cnyMusic.pause();
-                    cnyMusic.currentTime = 0;
-                }, 7000); 
-            } else {
-                // --- SMALL HIT ---
-                if(Tone.context.state !== 'running') { Tone.start(); }
-                kickSynth.triggerAttackRelease("C2", "8n");
-                triggerHaptic(false);
-            }
-
-            const frame = document.getElementById('villain-image-wrapper');
-            frame.classList.remove('shake-active');
-            void frame.offsetWidth; 
-            frame.classList.add('shake-active');
-
-            const rect = document.getElementById('villain-image').getBoundingClientRect();
-            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                createHorsePrint(x - rect.left, y - rect.top);
-            }
-
-            createTool(x, y);
-            createCurseText(x, y);
-        };
-
-        const createHorsePrint = (x, y) => {
-            const print = toolTemplate.cloneNode(true);
-            print.classList.replace('hidden', 'horseshoe-print');
-            print.style.left = `${x}px`;
-            print.style.top = `${y}px`;
-            print.style.transform = `translate(-50%, -50%) rotate(${(Math.random()-0.5)*60}deg)`;
-            printsLayer.appendChild(print);
-        };
-
-        const createTool = (x, y) => {
-            const tool = toolTemplate.cloneNode(true);
-            tool.classList.replace('hidden', 'tool');
-            tool.classList.add('hit-animation');
-            tool.style.left = `${x}px`;
-            tool.style.top = `${y}px`;
-            document.body.appendChild(tool);
-            tool.addEventListener('animationend', () => tool.remove());
-        };
-
-        const curses = [
-            "財寶留不住!", "嘴歪眼斜!", "壞事傳千里!", "霉運入肚!", 
-            "只能吃土!", "一生無路!", "口舌是非多!", "天天被放鴿!",
-            "業績掛鴨蛋!", "出門就下雨!", "走路常跌倒!", "買菜必漲價!",
-            "電腦常當機!", "手機沒訊號!", "衰神附體!", "衰到貼地!",
-            "小人退散!", "惡緣斷絕!", "霉運滾開!", "禍不單行!"
-        ];
-
-        const blessings = [
-            "馬上有錢!", "龍馬精神!", "馬到成功!", "一馬當先!", 
-            "富貴吉祥!", "財源廣進!", "大吉大利!", "萬事如意!",
-            "招財進寶!", "步步高升!", "金榜題名!", "時來運轉!"
-        ];
-
-        const createCurseText = (x, y) => {
-            const el = document.createElement('div');
-            el.className = 'curse-text';
-            el.innerText = curses[Math.floor(Math.random() * curses.length)];
-            el.style.setProperty('--tx-end', `${(Math.random()-0.5)*150}px`);
-            el.style.setProperty('--ty-end', `${(Math.random()-0.5)*150}px`);
-            el.style.left = `${x}px`;
-            el.style.top = `${y}px`;
-            document.body.appendChild(el);
-            el.addEventListener('animationend', () => el.remove());
-        };
-
-        const triggerProsperityRain = () => {
-            const prosperityIcons = ['🧧', '💰', '🪙', '💵', '💎', '✨', '🏮', '🍊', '🍍', '🎊'];
-            for (let i = 0; i < 30; i++) {
-                setTimeout(() => {
-                    const item = document.createElement('div');
-                    item.className = 'confetti';
-                    
-                    if (Math.random() > 0.4) {
-                        item.innerText = prosperityIcons[Math.floor(Math.random() * prosperityIcons.length)];
-                        item.style.fontSize = (25 + Math.random() * 25) + 'px';
-                    } else {
-                        item.innerText = blessings[Math.floor(Math.random() * blessings.length)];
-                        item.style.fontSize = (30 + Math.random() * 20) + 'px';
-                        item.style.color = '#fbbf24';
-                        item.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
-                    }
-                    
-                    item.style.left = Math.random() * 100 + 'vw';
-                    document.body.appendChild(item);
-                    item.addEventListener('animationend', () => item.remove());
-                }, i * 100); 
-            }
-        };
-
-        const showLuckyNumber = () => {
-            const luckyNum = Math.floor(1000 + Math.random() * 8999);
-            const container = document.createElement('div');
-            container.className = 'lucky-number-display';
-            container.innerHTML = `
-                <div class="text-yellow-400 text-2xl font-black mb-4 drop-shadow-md">🎉 今日發財號碼 🎉</div>
-                <div class="text-white text-9xl font-black italic tracking-tighter" style="text-shadow: 0 0 20px #fbbf24, 6px 6px 0px #450a0a;">
-                    ${luckyNum}
-                </div>
-            `;
-            document.body.appendChild(container);
-            container.addEventListener('animationend', () => container.remove());
-        };
-
-        resetButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            hitCount = 0;
-            counter.innerText = '0';
-            villainImage.src = defaultVillainSrc;
-            hasUploaded = false;
-            printsLayer.innerHTML = '';
-            document.getElementById('image-overlay-hint').classList.remove('hidden');
-            document.getElementById('villain-image-wrapper').classList.remove('shake-active');
-            villainContainer.classList.remove('villain-flattened');
-            dizzyStars.classList.remove('active');
-            horseAudio.pause();
-            horseAudio.currentTime = 0;
-            cnyMusic.pause();
-            cnyMusic.currentTime = 0;
-        });
-
-        window.addEventListener('mousedown', handleHit);
-        window.addEventListener('touchstart', (e) => {
-            if (e.target.closest('button') || e.target.closest('input')) return;
-            handleHit(e);
-        }, { passive: true });
-    </script>
-</body>
-</html>
