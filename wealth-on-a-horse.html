@@ -1,0 +1,313 @@
+<script>
+        const gameContainer = document.getElementById('game-container');
+        const villainContainer = document.getElementById('villain-container');
+        const villainImage = document.getElementById('villain-image');
+        const printsLayer = document.getElementById('prints-layer');
+        const uploadInput = document.getElementById('upload-input');
+        const counter = document.getElementById('counter');
+        const toolTemplate = document.getElementById('tool-svg');
+        const resetButton = document.getElementById('reset-button');
+        const toast = document.getElementById('toast');
+        const emojiBg = document.getElementById('emoji-background');
+        const dizzyStars = document.getElementById('dizzy-stars');
+        const defaultVillainSrc = villainImage.src;
+
+        let hitCount = 0;
+        let isSoundReady = false;
+        let isFlattened = false;
+        let hasUploaded = false;
+
+        // --- AUDIO CONFIGURATION ---
+
+        // 1. Horse Sounds
+        const horseSources = [
+            'https://actions.google.com/sounds/v1/animals/horse_neigh.ogg', 
+            'https://www.google.com/logos/fnbx/animal_sounds/horse.mp3'
+        ];
+        let horseIdx = 0;
+        const luckyHorseAudio = new Audio();
+        
+        // Load Horse Sound
+        const loadNextHorse = () => {
+            if (horseIdx >= horseSources.length) return;
+            luckyHorseAudio.src = horseSources[horseIdx];
+            luckyHorseAudio.load();
+        };
+        luckyHorseAudio.onerror = () => { horseIdx++; loadNextHorse(); };
+        loadNextHorse();
+
+        // 2. Synthesizer Setup (Tone.js)
+        // Kick for impact
+        const kickSynth = new Tone.MembraneSynth({
+            pitchDecay: 0.05,
+            octaves: 4,
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 },
+            volume: 10
+        }).toDestination();
+
+        // Noise for slap
+        const impactNoise = new Tone.NoiseSynth({
+            noise: { type: "white" },
+            envelope: { attack: 0.005, decay: 0.1, sustain: 0 },
+            volume: -5
+        }).toDestination();
+
+        // --- THE FIX: Gong Xi Fa Cai Melody ---
+        // This replaces the missing MP3 file with a generated song
+        const playCNYMelody = async () => {
+            await Tone.start(); // Ensure Audio Context is ready
+            
+            // Create a Chinese-style instrument (Plucked string sound)
+            const koto = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: "triangle" },
+                envelope: { attack: 0.05, decay: 0.2, sustain: 0.4, release: 0.8 }
+            }).toDestination();
+            koto.volume.value = -2;
+
+            const now = Tone.now();
+            const beat = 0.35; // Speed of the song
+
+            // Simple "Gong Xi Fa Cai" Melody Pattern
+            // Notes: A4, A4, A4, G4, E4, G4, D4...
+            const melody = [
+                // Gong Xi Gong Xi
+                { note: "A4", time: 0 }, { note: "A4", time: 1 }, 
+                // Gong Xi Ni Ya
+                { note: "A4", time: 2 }, { note: "G4", time: 2.5 }, { note: "E4", time: 3 }, { note: "G4", time: 3.5 }, { note: "D4", time: 4 },
+                // Gong Xi
+                { note: "E4", time: 6 }, { note: "A4", time: 7 },
+                // Gong Xi Ni Ya
+                { note: "E4", time: 8 }, { note: "D4", time: 8.5 }, { note: "C4", time: 9 }, { note: "D4", time: 9.5 }, { note: "E4", time: 10 },
+            ];
+
+            // Play the melody
+            melody.forEach(m => {
+                koto.triggerAttackRelease(m.note, "4n", now + (m.time * beat));
+            });
+
+            // Add a Drum Beat (Dong Dong Dong Qiang)
+            const drumLoop = [0, 1, 2, 3, 4, 6, 7, 8, 10];
+            drumLoop.forEach(i => {
+                kickSynth.triggerAttackRelease("C2", "8n", now + (i * beat));
+            });
+        };
+
+        // --- BACKGROUND & VISUALS ---
+        const horseEmojis = ['🐴', '🎠', '🏇', '🐎', '🦓', '🦄', '🐎', '🐴'];
+        for (let i = 0; i < 60; i++) {
+            const span = document.createElement('span');
+            span.className = 'bg-emoji';
+            span.innerText = horseEmojis[Math.floor(Math.random() * horseEmojis.length)];
+            span.style.left = Math.random() * 95 + 'vw';
+            span.style.top = Math.random() * 95 + 'vh';
+            span.style.transform = `rotate(${(Math.random() - 0.5) * 60}deg)`;
+            span.style.fontSize = (2.5 + Math.random() * 3.5) + 'rem';
+            emojiBg.appendChild(span);
+        }
+
+        const unlockAudio = async () => {
+            if (!isSoundReady) {
+                await Tone.start();
+                // Play silent note to unlock iOS audio
+                kickSynth.triggerAttackRelease("C2", "64n");
+                isSoundReady = true;
+            }
+        };
+
+        const playHorseSound = () => {
+             // Try to play horse audio, if fails, just ignore
+             luckyHorseAudio.currentTime = 0;
+             luckyHorseAudio.play().catch(e => console.log("Audio play blocked", e));
+        };
+
+        const triggerHaptic = (isBigHit = false) => {
+            if (navigator.vibrate) {
+                isBigHit ? navigator.vibrate([200, 100, 200]) : navigator.vibrate(50);
+            }
+        };
+
+        const handleHit = (e) => {
+            if (e.target.closest('button') || e.target.closest('label')) return;
+            
+            unlockAudio();
+
+            if (!hasUploaded) {
+                toast.style.opacity = '1';
+                setTimeout(() => toast.style.opacity = '0', 1500);
+                return;
+            }
+            if (isFlattened) return;
+            
+            hitCount++;
+            counter.innerText = hitCount;
+
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const y = e.clientY || (e.touches && e.touches[0].clientY);
+
+            if (hitCount % 50 === 0) {
+                // --- BIG HIT EVENT ---
+                playHorseSound();
+                triggerHaptic(true);
+
+                isFlattened = true;
+                villainContainer.classList.add('villain-flattened');
+                dizzyStars.classList.add('active'); 
+
+                triggerProsperityRain();
+                
+                // Play the corrected Music Function
+                setTimeout(() => {
+                    playCNYMelody();
+                    showLuckyNumber();
+                }, 500); 
+
+                setTimeout(() => {
+                    villainContainer.classList.remove('villain-flattened');
+                    dizzyStars.classList.remove('active');
+                    isFlattened = false;
+                    printsLayer.innerHTML = '';
+                }, 7000);
+            } else {
+                // --- SMALL HIT EVENT ---
+                if(isSoundReady) {
+                    const now = Tone.now();
+                    kickSynth.triggerAttackRelease("C2", "8n", now);
+                    impactNoise.triggerAttackRelease("32n", now);
+                }
+                triggerHaptic(false);
+            }
+
+            // Animations (Shake & Print)
+            const frame = document.getElementById('villain-image-wrapper');
+            frame.classList.remove('shake-active');
+            void frame.offsetWidth; 
+            frame.classList.add('shake-active');
+
+            const rect = document.getElementById('villain-image').getBoundingClientRect();
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                createHorsePrint(x - rect.left, y - rect.top);
+            }
+
+            createTool(x, y);
+            createCurseText(x, y);
+        };
+
+        const createHorsePrint = (x, y) => {
+            const print = toolTemplate.cloneNode(true);
+            print.classList.replace('hidden', 'horseshoe-print');
+            print.style.left = `${x}px`;
+            print.style.top = `${y}px`;
+            print.style.transform = `translate(-50%, -50%) rotate(${(Math.random()-0.5)*60}deg)`;
+            printsLayer.appendChild(print);
+        };
+
+        const createTool = (x, y) => {
+            const tool = toolTemplate.cloneNode(true);
+            tool.classList.replace('hidden', 'tool');
+            tool.classList.add('hit-animation');
+            tool.style.left = `${x}px`;
+            tool.style.top = `${y}px`;
+            document.body.appendChild(tool);
+            tool.addEventListener('animationend', () => tool.remove());
+        };
+
+        const curses = [
+            "財寶留不住!", "嘴歪眼斜!", "壞事傳千里!", "霉運入肚!", 
+            "只能吃土!", "一生無路!", "口舌是非多!", "天天被放鴿!",
+            "業績掛鴨蛋!", "出門就下雨!", "走路常跌倒!", "買菜必漲價!",
+            "電腦常當機!", "手機沒訊號!", "衰神附體!", "衰到貼地!",
+            "小人退散!", "惡緣斷絕!", "霉運滾開!", "禍不單行!"
+        ];
+
+        const blessings = [
+            "馬上有錢!", "龍馬精神!", "馬到成功!", "一馬當先!", 
+            "富貴吉祥!", "財源廣進!", "大吉大利!", "萬事如意!",
+            "招財進寶!", "步步高升!", "金榜題名!", "時來運轉!"
+        ];
+
+        const createCurseText = (x, y) => {
+            const el = document.createElement('div');
+            el.className = 'curse-text';
+            el.innerText = curses[Math.floor(Math.random() * curses.length)];
+            el.style.setProperty('--tx-end', `${(Math.random()-0.5)*150}px`);
+            el.style.setProperty('--ty-end', `${(Math.random()-0.5)*150}px`);
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            document.body.appendChild(el);
+            el.addEventListener('animationend', () => el.remove());
+        };
+
+        const triggerProsperityRain = () => {
+            const prosperityIcons = ['🧧', '💰', '🪙', '💵', '💎', '✨', '🏮', '🍊', '🍍', '🎊'];
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const item = document.createElement('div');
+                    item.className = 'confetti';
+                    
+                    if (Math.random() > 0.4) {
+                        item.innerText = prosperityIcons[Math.floor(Math.random() * prosperityIcons.length)];
+                        item.style.fontSize = (25 + Math.random() * 25) + 'px';
+                    } else {
+                        item.innerText = blessings[Math.floor(Math.random() * blessings.length)];
+                        item.style.fontSize = (30 + Math.random() * 20) + 'px';
+                        item.style.color = '#fbbf24';
+                        item.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+                    }
+                    
+                    item.style.left = Math.random() * 100 + 'vw';
+                    document.body.appendChild(item);
+                    item.addEventListener('animationend', () => item.remove());
+                }, i * 100); 
+            }
+        };
+
+        const showLuckyNumber = () => {
+            const luckyNum = Math.floor(1000 + Math.random() * 8999);
+            const container = document.createElement('div');
+            container.className = 'lucky-number-display';
+            container.innerHTML = `
+                <div class="text-yellow-400 text-2xl font-black mb-4 drop-shadow-md">🎉 今日發財號碼 🎉</div>
+                <div class="text-white text-9xl font-black italic tracking-tighter" style="text-shadow: 0 0 20px #fbbf24, 6px 6px 0px #450a0a;">
+                    ${luckyNum}
+                </div>
+            `;
+            document.body.appendChild(container);
+            container.addEventListener('animationend', () => container.remove());
+        };
+
+        uploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    villainImage.src = e.target.result;
+                    hasUploaded = true;
+                    hitCount = 0;
+                    counter.innerText = '0';
+                    printsLayer.innerHTML = '';
+                    document.getElementById('image-overlay-hint').classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        resetButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hitCount = 0;
+            counter.innerText = '0';
+            villainImage.src = defaultVillainSrc;
+            hasUploaded = false;
+            printsLayer.innerHTML = '';
+            document.getElementById('image-overlay-hint').classList.remove('hidden');
+            document.getElementById('villain-image-wrapper').classList.remove('shake-active');
+            villainContainer.classList.remove('villain-flattened');
+            dizzyStars.classList.remove('active');
+        });
+
+        window.addEventListener('mousedown', handleHit);
+        window.addEventListener('touchstart', (e) => {
+            if (e.target.closest('button') || e.target.closest('label')) return;
+            handleHit(e);
+        }, { passive: true });
+    </script>
