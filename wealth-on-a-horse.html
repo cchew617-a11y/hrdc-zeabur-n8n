@@ -303,7 +303,7 @@
             </div>
 
             <div id="villain-image-wrapper" class="villain-frame">
-                <img id="villain-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTEwIiByPSI3MCIgZmlsbD0iI2I0NWYwNiIvPgogIDxjaXJjbGUgY3g9Ijc1IiBjeT0iOTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEyNSIgY3k9Ijk1IiByPSIyMCIgZmlsbD0id2hpdGUiLz4KICA8cGF0aCBdD0JNNzAgMTM1IEMgODAgMTUwLCAxMjAgMTUwLCAxMzAgMTM1IiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=" class="w-full h-full object-cover">
+                <img id="villain-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTEwIiByPSI3MCIgZmlsbD0iI2I0NWYwNiIvPgogIDxjaXJjbGUgY3g9Ijc1IiBjeT0iOTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEyNSIgY3k9Ijk1IiByPSIyMCIgZmlsbD0id2hpdGUiLz4KICA8cGF0aCBkPSJNNzAgMTM1IEMgODAgMTUwLCAxMjAgMTUwLCAxMzAgMTM1IiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=" class="w-full h-full object-cover">
                 <div id="image-overlay-hint" class="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
                     <span class="text-white font-bold text-sm bg-red-600 px-3 py-1 rounded-full border border-yellow-400">鎖定小人對象</span>
                 </div>
@@ -378,6 +378,7 @@
 
         // --- AUDIO SETUP ---
         const horseAudio = new Audio('https://www.google.com/logos/fnbx/animal_sounds/horse.mp3');
+        horseAudio.load(); // Preload audio
         const userMusicFile = 'viacheslavstarostin-chinese-lunar-new-year-465871.mp3';
         const musicSource = 'https://raw.githubusercontent.com/pe601/mp3/master/GongXiFaCai.mp3';
 
@@ -385,53 +386,62 @@
         cnyMusic.src = userMusicFile;
         cnyMusic.volume = 0; // Start at zero
         cnyMusic.loop = true; // Ensure music loops
+        cnyMusic.load(); // Preload audio
 
         cnyMusic.onerror = () => {
             if (cnyMusic.src !== musicSource) {
                 console.log("Switching to backup music...");
                 cnyMusic.src = musicSource;
+                cnyMusic.load(); // Load backup source as well
             }
         };
 
         // Function to unlock audio context on the first user interaction
-        const unlockAudio = async () => {
+        const initAudio = async () => {
             if (isAudioUnlocked) return;
 
             try {
                 // For Web Audio API (Tone.js)
+                // Tone.start() is typically all that's needed for Web Audio API
                 await Tone.start();
                 console.log("Tone.js audio context unlocked.");
 
                 // For HTML5 Audio elements
-                // Attempt to play a silent sound and pause immediately
-                // This "blesses" the HTML5 audio elements for future playback
-                const silentAudio = new Audio();
-                silentAudio.src = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU1UAAAAPAAADTGF2ZjU4LjM1LjEwMAAAAAAAAAAAAAAA//tAxAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVFRTbm9uZQAAAAAAAAAAAAAA//sAwgAAAZAAAADkAAAEhGVwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD/7AMAwAEABQAAAAAUAAADsQAAAAMAAgAAAEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABTbm9uZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/7ADo0ABlFAAAAQAAAOQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-                silentAudio.volume = 0; // Ensure it's silent
-                await silentAudio.play();
-                silentAudio.pause();
-                silentAudio.remove(); // Clean up
+                // Attempt to play and pause both horseAudio and cnyMusic to "bless" them
+                await horseAudio.play();
+                horseAudio.pause();
+                horseAudio.currentTime = 0; // Reset for actual playback
 
-                // Attempt to play and pause CNY music to bless it specifically
                 await cnyMusic.play();
                 cnyMusic.pause();
                 cnyMusic.currentTime = 0; // Reset for actual playback
 
+                // A tiny silent audio element as a fallback for extreme cases
+                const silentAudio = new Audio();
+                silentAudio.src = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU1UAAAAPAAADTGF2ZjU4LjM1LjEwMAAAAAAAAAAAAAAA//tAxAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVFRTbm9uZQAAAAAAAAAAAAAA//sAwgAAAZAAAADkAAAEhGVwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD/7AMAwAEABQAAAAAUAAADsQAAAAMAAgAAAEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABTbm9uZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/7ADo0ABlFAAAAQAAAOQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+                silentAudio.volume = 0;
+                await silentAudio.play();
+                silentAudio.pause();
+                silentAudio.remove(); // Clean up
+
                 isAudioUnlocked = true;
-                console.log("All audio contexts unlocked!");
+                console.log("All audio initialized successfully!");
+
+                // Remove the event listeners after successful initialization
+                document.body.removeEventListener('click', initAudio, { capture: true });
+                document.body.removeEventListener('touchstart', initAudio, { capture: true });
 
             } catch (e) {
-                console.error("Failed to unlock audio context:", e);
-                // In case of error, still set unlocked to true to avoid repeated attempts
-                // but console log the issue.
+                console.error("Failed to initialize audio:", e);
+                // Even if there's an error, mark as unlocked to prevent repeated attempts
                 isAudioUnlocked = true;
             }
         };
 
-        // Attach the unlockAudio function to the first mousedown/touchstart event on the document
-        // This ensures ANY interaction on the page unlocks audio
-        document.addEventListener('mousedown', unlockAudio, { once: true });
-        document.addEventListener('touchstart', unlockAudio, { once: true });
+        // Attach the initAudio function to the first mousedown/touchstart event on the *document body*
+        // Use capture: true to ensure it fires as early as possible in the event phase
+        document.body.addEventListener('click', initAudio, { once: true, capture: true });
+        document.body.addEventListener('touchstart', initAudio, { once: true, capture: true });
 
 
         // --- UPLOAD HANDLER ---
@@ -473,12 +483,16 @@
             }
         };
 
-        const handleHit = async (e) => { // Made async to await unlockAudio if needed
+        const handleHit = async (e) => {
             if (e.target.closest('button') || e.target.closest('input')) return;
 
-            // Ensure audio is unlocked on first meaningful interaction
+            // Ensure audio is initialized on first *gameplay* interaction if it somehow wasn't before
             if (!isAudioUnlocked) {
-                await unlockAudio(); // Await to ensure context is ready
+                 await initAudio(); // Await to ensure context is ready
+                 if (!isAudioUnlocked) { // If still not unlocked after attempt, prevent play
+                     console.warn("Audio not unlocked, preventing hit sound.");
+                     return;
+                 }
             }
 
             if (!hasUploaded) {
@@ -496,15 +510,16 @@
 
             if (hitCount % 50 === 0) {
                 // --- BIG HIT ---
-                horseAudio.currentTime = 0;
+                horseAudio.currentTime = 0; // Reset to start
                 horseAudio.play().catch(e => console.error("Horse audio failed to play:", e));
 
                 cnyMusic.currentTime = 0; // Ensure music starts from beginning
                 cnyMusic.play().catch(e => {
                     console.error("CNY music failed to play:", e);
-                    if (cnyMusic.src !== musicSource) {
+                    if (cnyMusic.src !== musicSource) { // Fallback if initial URL failed
                         cnyMusic.src = musicSource;
-                        cnyMusic.play();
+                        cnyMusic.load(); // Load the fallback source
+                        cnyMusic.play().catch(e => console.error("Fallback CNY music failed to play:", e));
                     }
                 });
 
@@ -535,7 +550,8 @@
             } else {
                 // --- SMALL HIT ---
                 if (Tone.context.state !== 'running') {
-                    await Tone.start(); // Ensure Tone.js context is running
+                    // This case should ideally not happen if initAudio worked, but as a safeguard:
+                    await Tone.start().catch(e => console.error("Tone.start failed in small hit:", e));
                 }
                 kickSynth.triggerAttackRelease("C2", "8n");
                 triggerHaptic(false);
@@ -638,7 +654,7 @@
             container.addEventListener('animationend', () => container.remove());
         };
 
-        resetButton.addEventListener('click', (e) => {
+        resetButton.addEventListener('click', async (e) => {
             e.stopPropagation();
             hitCount = 0;
             counter.innerText = '0';
@@ -649,11 +665,22 @@
             document.getElementById('villain-image-wrapper').classList.remove('shake-active');
             villainContainer.classList.remove('villain-flattened');
             dizzyStars.classList.remove('active');
+            
+            // Ensure audio is fully stopped and reset
             horseAudio.pause();
             horseAudio.currentTime = 0;
             cnyMusic.pause();
             cnyMusic.currentTime = 0;
             cnyMusic.volume = 0; // Reset music volume
+            
+            // If Tone.js context is running, stop it for a clean reset if desired
+            if (Tone.context.state === 'running') {
+                await Tone.context.suspend(); // Suspend, don't close, to allow re-start
+            }
+            // Reset audio unlocked state for a fresh start after reset, if user clicks again
+            isAudioUnlocked = false; 
+            document.body.addEventListener('click', initAudio, { once: true, capture: true });
+            document.body.addEventListener('touchstart', initAudio, { once: true, capture: true });
         });
 
         // Use the handleHit function directly for game interactions
