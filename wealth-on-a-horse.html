@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>馬上有錢！ (Wealth on a horse!)</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (Note: console warning about production use remains, but it's not a functional error) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tone.js (Kick sound only) -->
+    <!-- Tone.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
@@ -376,14 +376,13 @@
         let isFlattened = false;
         let hasUploaded = false;
 
-// --- AUDIO SETUP ---
+        // --- AUDIO SETUP ---
         const horseAudio = new Audio('https://www.google.com/logos/fnbx/animal_sounds/horse.mp3'); // This URL seems reliable
         horseAudio.load(); // Preload audio
 
         // Assuming this file will be in the same directory as your HTML
         const userMusicFile = 'chinese-lunar-new-year.mp3';
-        // Assuming this backup file will ALSO be in the same directory as your HTML
-        //const musicSource = 'GongXiFaCai.mp3';
+        // Removed `musicSource` as you no longer want a fallback.
 
         const cnyMusic = new Audio();
         cnyMusic.src = userMusicFile;
@@ -391,13 +390,10 @@
         cnyMusic.loop = true; // Ensure music loops
         cnyMusic.load(); // Preload audio
 
+        // Modified onerror to only log, not attempt a fallback that doesn't exist
         cnyMusic.onerror = () => {
-            console.warn(`Failed to load primary music source: ${userMusicFile}. Attempting backup: ${musicSource}`);
-            if (cnyMusic.src !== musicSource) { // Only switch if not already using backup
-                cnyMusic.src = musicSource;
-                cnyMusic.load(); // Load backup source as well
-                cnyMusic.play().catch(e => console.error("Fallback CNY music failed to play:", e)); // Try playing backup
-            }
+            console.error(`Failed to load primary music source: ${userMusicFile}. No backup specified.`);
+            // No action taken here as there's no backup.
         };
 
         // Function to unlock audio context on the first user interaction
@@ -406,7 +402,6 @@
 
             try {
                 // For Web Audio API (Tone.js)
-                // Tone.start() is typically all that's needed for Web Audio API
                 await Tone.start();
                 console.log("Tone.js audio context unlocked.");
 
@@ -416,11 +411,14 @@
                 horseAudio.pause();
                 horseAudio.currentTime = 0; // Reset for actual playback
 
-                await cnyMusic.play();
-                cnyMusic.pause();
-                cnyMusic.currentTime = 0; // Reset for actual playback
+                // Only attempt to play cnyMusic if it has a valid source
+                if (cnyMusic.src && cnyMusic.src !== window.location.href) { // check if src is set and not pointing to current page
+                    await cnyMusic.play();
+                    cnyMusic.pause();
+                    cnyMusic.currentTime = 0; // Reset for actual playback
+                }
 
-                // A tiny silent audio element as a fallback for extreme cases
+                // A tiny silent audio element as a fallback for extreme cases (still good to keep)
                 const silentAudio = new Audio();
                 silentAudio.src = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU1UAAAAPAAADTGF2ZjU4LjM1LjEwMAAAAAAAAAAAAAAA//tAxAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVFRTbm9uZQAAAAAAAAAAAAAA//sAwgAAAZAAAADkAAAEhGVwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD/7AMAwAEABQAAAAAUAAADsQAAAAMAAgAAAEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABTbm9uZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/7ADo0ABlFAAAAQAAAOQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
                 silentAudio.volume = 0;
@@ -517,15 +515,15 @@
                 horseAudio.currentTime = 0; // Reset to start
                 horseAudio.play().catch(e => console.error("Horse audio failed to play:", e));
 
-                cnyMusic.currentTime = 0; // Ensure music starts from beginning
-                cnyMusic.play().catch(e => {
-                    console.error("CNY music failed to play:", e);
-                    if (cnyMusic.src !== musicSource) { // Fallback if initial URL failed
-                        cnyMusic.src = musicSource;
-                        cnyMusic.load(); // Load the fallback source
-                        cnyMusic.play().catch(e => console.error("Fallback CNY music failed to play:", e));
-                    }
-                });
+                // Only play cnyMusic if it has a valid source and is unlocked
+                if (cnyMusic.src && cnyMusic.src !== window.location.href) {
+                    cnyMusic.currentTime = 0; // Ensure music starts from beginning
+                    cnyMusic.play().catch(e => {
+                        console.error("CNY music failed to play:", e);
+                    });
+                } else {
+                    console.warn("CNY music source is not set or invalid, skipping playback.");
+                }
 
                 // Smoothly ramp up the music volume after the horse sound
                 setTimeout(() => {
@@ -554,7 +552,6 @@
             } else {
                 // --- SMALL HIT ---
                 if (Tone.context.state !== 'running') {
-                    // This case should ideally not happen if initAudio worked, but as a safeguard:
                     await Tone.start().catch(e => console.error("Tone.start failed in small hit:", e));
                 }
                 kickSynth.triggerAttackRelease("C2", "8n");
@@ -677,9 +674,9 @@
             cnyMusic.currentTime = 0;
             cnyMusic.volume = 0; // Reset music volume
             
-            // If Tone.js context is running, stop it for a clean reset if desired
+            // If Tone.js context is running, suspend it
             if (Tone.context.state === 'running') {
-                await Tone.context.suspend(); // Suspend, don't close, to allow re-start
+                await Tone.context.suspend();
             }
             // Reset audio unlocked state for a fresh start after reset, if user clicks again
             isAudioUnlocked = false; 
