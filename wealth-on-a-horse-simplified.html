@@ -1,1 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>马上有钱！ (Wealth on a Horse!)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --temple-red: #800000;
+            --temple-gold: #fbbf24;
+        }
 
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            touch-action: manipulation;
+            background-color: var(--temple-red);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='20' viewBox='0 0 100 20'%3E%3Cpath d='M0 10 Q 25 0 50 10 T 100 10' fill='none' stroke='%23a52a2a' stroke-width='1'/%3E%3C/svg%3E");
+            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Background horse emojis */
+        .bg-emoji {
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.15;
+            z-index: 0;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .header-banner {
+            background-color: #450a0a;
+            border-bottom: 4px solid var(--temple-gold);
+            padding: 8px 0;
+            text-align: center;
+            z-index: 50;
+        }
+
+        .main-stage {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            padding: 1rem 0;
+            z-index: 10;
+        }
+
+        .villain-frame {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            background: #ffffff;
+            border: 6px solid var(--temple-gold);
+            border-radius: 40px;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: transform 0.1s;
+        }
+        
+        .villain-frame:active {
+            transform: scale(0.95);
+        }
+
+        /* Shaking Animation */
+        @keyframes shake {
+            0% { transform: translate(2px, 2px) rotate(0deg); }
+            10% { transform: translate(-2px, -3px) rotate(-2deg); }
+            20% { transform: translate(-4px, 0px) rotate(2deg); }
+            30% { transform: translate(4px, 3px) rotate(0deg); }
+            40% { transform: translate(2px, -2px) rotate(2deg); }
+            50% { transform: translate(-2px, 3px) rotate(-2deg); }
+            60% { transform: translate(-4px, 2px) rotate(0deg); }
+            70% { transform: translate(4px, 2px) rotate(-2deg); }
+            80% { transform: translate(-2px, -2px) rotate(2deg); }
+            90% { transform: translate(2px, 3px) rotate(0deg); }
+            100% { transform: translate(2px, -3px) rotate(-2deg); }
+        }
+
+        .shake-active {
+            animation: shake 0.15s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* Dizzy Stars Effect */
+        .dizzy-stars-container {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 60px;
+            pointer-events: none;
+            display: none;
+            z-index: 100;
+        }
+        .villain-flattened .dizzy-stars-container {
+            display: block;
+        }
+        .dizzy-star {
+            position: absolute;
+            font-size: 1.8rem;
+            filter: drop-shadow(0 0 5px gold);
+            animation: orbit-star 2s linear infinite;
+        }
+        .dizzy-star:nth-child(2) { animation-delay: -0.66s; }
+        .dizzy-star:nth-child(3) { animation-delay: -1.33s; }
+
+        @keyframes orbit-star {
+            from { transform: rotate(0deg) translateX(40px) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(40px) rotate(-360deg); }
+        }
+
+        .tool {
+            position: absolute;
+            width: 140px; 
+            height: 140px;
+            pointer-events: none;
+            transform-origin: center;
+            opacity: 0;
+            z-index: 100;
+        }
+        .hit-animation {
+            animation: horse-stamp 0.2s ease-out forwards;
+        }
+        @keyframes horse-stamp {
+            0% { transform: translate(-50%, -120%) scale(1.8); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -45%) scale(1); opacity: 0; }
+        }
+
+        .horseshoe-print {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            pointer-events: none;
+            opacity: 0.4;
+            z-index: 40;
+            animation: fade-out-print 5s ease-in forwards;
+        }
+        @keyframes fade-out-print {
+            0% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        .curse-text {
+            position: absolute;
+            pointer-events: none;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #fef08a; 
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.9);
+            z-index: 50;
+            white-space: nowrap;
+            animation: curse-burst-anim 1s forwards;
+        }
+        @keyframes curse-burst-anim {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translate(calc(-50% + var(--tx-end)), calc(-50% + var(--ty-end))) scale(1.2); opacity: 0; }
+        }
+
+        .lucky-number-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 300;
+            pointer-events: none;
+            text-align: center;
+            width: auto;
+            min-width: 260px;
+            max-width: 90%;
+            animation: lucky-pop 6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            background: rgba(0,0,0,0.85);
+            padding: 1.5rem;
+            border-radius: 2rem;
+            border: 3px solid var(--temple-gold);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+        }
+        @keyframes lucky-pop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            10% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -60%) scale(1.1); opacity: 0; }
+        }
+
+        .villain-flattened {
+            transform: scale(2.5, 0.05) translateY(400px);
+        }
+
+        .confetti {
+            position: absolute;
+            z-index: 150;
+            pointer-events: none;
+            animation: confetti-fall 5s linear forwards; 
+            white-space: nowrap;
+            font-weight: 900;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-10vh) rotate(0); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        .btn-game {
+            border-radius: 20px;
+            font-weight: 900;
+            padding: 1rem 1.5rem;
+            transition: transform 0.1s;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            min-width: 140px;
+        }
+        .btn-game:active { transform: translateY(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+
+        .counter-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #5c1c1c;
+            border-radius: 30px;
+            padding: 1rem 2rem;
+            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+            .villain-frame { width: 160px; height: 160px; }
+            h1 { font-size: 2.2rem !important; }
+            .btn-game { min-width: 110px; padding: 0.7rem; font-size: 0.875rem; }
+            .counter-box { padding: 0.8rem 1.5rem; }
+            .curse-text { font-size: 2.2rem; }
+            .lucky-number-display { padding: 1rem; min-width: 240px; }
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <div id="emoji-background"></div>
+
+    <div class="header-banner">
+        <div class="text-yellow-400 text-xs md:text-lg font-black tracking-widest uppercase">2026 丙午年 · 马力喷发 · 衰气蒸发</div>
+    </div>
+
+    <main id="game-container" class="main-stage cursor-pointer">
+        
+        <div class="text-center px-4">
+            <h1 class="text-5xl md:text-6xl font-black text-yellow-400 tracking-tight drop-shadow-lg">神马踢飞小人庙</h1>
+            <h2 class="text-xl md:text-3xl font-bold text-white italic mt-1">马上有钱，小人走远</h2>
+            <p class="text-red-300 text-lg font-bold"># 蹄到你怀疑人生 #</p>
+        </div>
+
+        <div id="villain-container" class="relative transition-transform duration-500">
+            <!-- Dizzy Stars Animation -->
+            <div class="dizzy-stars-container">
+                <div class="dizzy-star">⭐</div>
+                <div class="dizzy-star">⭐</div>
+                <div class="dizzy-star">⭐</div>
+            </div>
+
+            <div id="villain-image-wrapper" class="villain-frame">
+                <img id="villain-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTEwIiByPSI3MCIgZmlsbD0iI2I0NWYwNiIvPgogIDxjaXJjbGUgY3g9Ijc1IiBjeT0iOTUiIHI9IjE1IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEyNSIgY3k9Ijk1IiByPSIyMCIgZmlsbD0id2hpdGUiLz4KICA8cGF0aCBkPSJNNzAgMTM1IEMgODAgMTUwLCAxMjAgMTUwLCAxMzAgMTM1IiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=" class="w-full h-full object-cover">
+                <div id="image-overlay-hint" class="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
+                    <span class="text-white font-bold text-xs bg-red-600 px-3 py-1 rounded-full border border-yellow-400">锁定小人</span>
+                </div>
+                <div id="prints-layer" class="absolute inset-0 pointer-events-none"></div>
+            </div>
+            <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-yellow-500 text-red-950 px-5 py-1 rounded-full text-lg font-black shadow-xl z-10 border-2 border-red-950 whitespace-nowrap">
+                此人欠踢
+            </div>
+        </div>
+
+        <div class="flex flex-row gap-4 px-4 w-full max-w-md justify-center">
+            <label for="upload-input" class="btn-game bg-yellow-500 text-red-950 flex-1 flex items-center justify-center cursor-pointer shadow-[0_0_20px_rgba(251,191,36,0.5)] text-center text-sm md:text-base">
+                上传小人照
+            </label>
+            <button id="reset-button" class="btn-game bg-red-700 text-yellow-400 border-2 border-yellow-500 flex-1 text-sm md:text-base">
+                蹄下留情
+            </button>
+            <input type="file" id="upload-input" class="hidden" accept="image/*">
+        </div>
+
+        <div class="flex flex-col items-center gap-3">
+            <div class="counter-box">
+                <div class="text-yellow-500 text-xs font-black uppercase tracking-widest mb-1">马脚功德榜</div>
+                <div class="text-4xl md:text-5xl font-black text-yellow-400">
+                    已蹄爆: <span id="counter">0</span>
+                </div>
+            </div>
+
+            <footer class="text-center px-4">
+                <div class="text-yellow-100/60 text-[11px]">免责声明：本游戏纯属娱乐，马蹄之下众生平等。</div>
+                <div class="mt-1">
+                    <a href="https://sites.google.com/view/jason-chew-ai-classroom/home" target="_blank" class="text-yellow-500 text-[11px] font-bold no-underline opacity-80 hover:opacity-100">
+                        Design By: Jason Chew's AI Classroom
+                    </a>
+                </div>
+            </footer>
+        </div>
+
+    </main>
+
+    <svg id="tool-svg" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <path d="M20,30 C20,10 80,10 80,30 L80,70 C80,85 65,95 50,95 C35,95 20,85 20,70 Z" fill="none" stroke="#fbbf24" stroke-width="12" stroke-linecap="round"/>
+        <path d="M35,30 C35,20 65,20 65,30 L65,70 C65,78 58,83 50,83 C42,83 35,78 35,70 Z" fill="none" stroke="#450a0a" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="30" cy="40" r="3" fill="#450a0a" /><circle cx="30" cy="55" r="3" fill="#450a0a" /><circle cx="30" cy="70" r="3" fill="#450a0a" />
+        <circle cx="70" cy="40" r="3" fill="#450a0a" /><circle cx="70" cy="55" r="3" fill="#450a0a" /><circle cx="70" cy="70" r="3" fill="#450a0a" />
+    </svg>
+
+    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-900 text-yellow-400 px-8 py-5 rounded-3xl z-[999] opacity-0 pointer-events-none transition-opacity duration-300 shadow-2xl border-4 border-yellow-500 text-center font-bold w-[90%] md:w-auto">
+        <div class="text-2xl mb-1">🐴 蹄不虚发！</div>
+        <div class="text-white">请先上传小人照片<br>再进行正义的马踢！</div>
+    </div>
+
+    <script>
+        const gameContainer = document.getElementById('game-container');
+        const villainContainer = document.getElementById('villain-container');
+        const villainImage = document.getElementById('villain-image');
+        const printsLayer = document.getElementById('prints-layer');
+        const uploadInput = document.getElementById('upload-input');
+        const counter = document.getElementById('counter');
+        const toolTemplate = document.getElementById('tool-svg');
+        const resetButton = document.getElementById('reset-button');
+        const toast = document.getElementById('toast');
+        const emojiBg = document.getElementById('emoji-background');
+        const defaultVillainSrc = villainImage.src;
+
+        let hitCount = 0;
+        let isSoundReady = false;
+        let isFlattened = false;
+        let hasUploaded = false;
+
+        const horseEmojis = ['🐴', '🎠', '🏇', '🐎', '🦓', '🦄', '🐎', '🐴'];
+        for (let i = 0; i < 60; i++) {
+            const span = document.createElement('span');
+            span.className = 'bg-emoji';
+            span.innerText = horseEmojis[Math.floor(Math.random() * horseEmojis.length)];
+            span.style.left = Math.random() * 95 + 'vw';
+            span.style.top = Math.random() * 95 + 'vh';
+            span.style.transform = `rotate(${(Math.random() - 0.5) * 60}deg)`;
+            span.style.fontSize = (2.5 + Math.random() * 3.5) + 'rem';
+            emojiBg.appendChild(span);
+        }
+
+        // Standardized volumes to 0dB to prevent initial loud burst/clipping
+        const kickSynth = new Tone.MembraneSynth({ volume: 0 }).toDestination();
+        const horseNeigh = new Tone.NoiseSynth({ envelope: { attack: 0.2, decay: 2.5, sustain: 0.3 }, volume: 0 }).toDestination();
+        const horseSqueal = new Tone.FMSynth({ harmonicity: 3, modulationIndex: 20, volume: 0 }).toDestination();
+
+        const curses = [
+            "财宝留不住!", "嘴歪眼斜!", "坏事传千里!", "霉运入肚!", 
+            "只能吃土!", "一生无路!", "口舌是非多!", "天天被放鸽!",
+            "业绩挂鸭蛋!", "出门就下雨!", "走路常跌倒!", "买菜必涨价!",
+            "电脑常当机!", "手机没信号!", "衰神附体!", "衰到贴地!",
+            "小人退散!", "恶缘断绝!", "霉运滚开!", "祸不单行!"
+        ];
+
+        const blessings = [
+            "大发特发!", "马上有钱!", "黄金万两!", "财源广进!", 
+            "好运连连!", "大吉大利!", "万事如意!", "招财进宝!",
+            "步步高升!", "心想事成!", "金玉满堂!", "如鱼得水!"
+        ];
+
+        const initAudio = async () => {
+            if (!isSoundReady) {
+                await Tone.start();
+                isSoundReady = true;
+            }
+        };
+
+        const playHorseSound = () => {
+            if (!isSoundReady) return;
+            const now = Tone.now();
+            horseNeigh.triggerAttackRelease("2s", now);
+            horseSqueal.triggerAttackRelease("C6", "0.8s", now);
+            horseSqueal.triggerAttackRelease("G5", "1s", now + 0.4);
+            horseSqueal.triggerAttackRelease("E6", "1.2s", now + 1.0);
+        };
+
+        const handleHit = (e) => {
+            if (e.target.closest('button') || e.target.closest('label') || e.target.closest('a')) return;
+            if (!hasUploaded) {
+                toast.style.opacity = '1';
+                setTimeout(() => toast.style.opacity = '0', 1500);
+                return;
+            }
+            if (isFlattened) return;
+
+            if (navigator.vibrate) {
+                navigator.vibrate(20);
+            }
+
+            // Standardize audio trigger with current Tone time
+            initAudio().then(() => {
+                const now = Tone.now();
+                kickSynth.triggerAttackRelease("C2", "32n", now);
+            });
+            
+            hitCount++;
+            counter.innerText = hitCount;
+
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const y = e.clientY || (e.touches && e.touches[0].clientY);
+
+            villainContainer.classList.remove('shake-active');
+            void villainContainer.offsetWidth; 
+            villainContainer.classList.add('shake-active');
+
+            const rect = villainImage.getBoundingClientRect();
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                createHorsePrint(x - rect.left, y - rect.top);
+            }
+
+            if (hitCount % 50 === 0) {
+                isFlattened = true;
+                villainContainer.classList.add('villain-flattened');
+                triggerProsperityRain();
+                setTimeout(showLuckyNumber, 1000); 
+                setTimeout(() => {
+                    villainContainer.classList.remove('villain-flattened');
+                    isFlattened = false;
+                    printsLayer.innerHTML = ''; 
+                }, 7000);
+            }
+
+            createTool(x, y);
+            createCurseText(x, y);
+        };
+
+        const createHorsePrint = (x, y) => {
+            const print = toolTemplate.cloneNode(true);
+            print.classList.replace('hidden', 'horseshoe-print');
+            print.style.left = `${x}px`;
+            print.style.top = `${y}px`;
+            print.style.transform = `translate(-50%, -50%) rotate(${(Math.random()-0.5)*60}deg)`;
+            printsLayer.appendChild(print);
+        };
+
+        const createTool = (x, y) => {
+            const tool = toolTemplate.cloneNode(true);
+            tool.classList.replace('hidden', 'tool');
+            tool.classList.add('hit-animation');
+            tool.style.left = `${x}px`;
+            tool.style.top = `${y}px`;
+            document.body.appendChild(tool);
+            tool.addEventListener('animationend', () => tool.remove());
+        };
+
+        const createCurseText = (x, y) => {
+            const el = document.createElement('div');
+            el.className = 'curse-text';
+            el.innerText = curses[Math.floor(Math.random() * curses.length)];
+            el.style.setProperty('--tx-end', `${(Math.random()-0.5)*200}px`);
+            el.style.setProperty('--ty-end', `${(Math.random()-0.5)*200}px`);
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            document.body.appendChild(el);
+            el.addEventListener('animationend', () => el.remove());
+        };
+
+        const triggerProsperityRain = () => {
+            const prosperityIcons = ['🧧', '💰', '🪙', '💵', '💎', '✨', '🏮', '🍊', '🍍', '🎊'];
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const item = document.createElement('div');
+                    item.className = 'confetti';
+                    
+                    if (Math.random() > 0.4) {
+                        item.innerText = prosperityIcons[Math.floor(Math.random() * prosperityIcons.length)];
+                        item.style.fontSize = (25 + Math.random() * 25) + 'px';
+                    } else {
+                        item.innerText = blessings[Math.floor(Math.random() * blessings.length)];
+                        item.style.fontSize = (22 + Math.random() * 12) + 'px';
+                        item.style.color = '#fbbf24';
+                        item.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+                    }
+                    
+                    item.style.left = Math.random() * 100 + 'vw';
+                    document.body.appendChild(item);
+                    item.addEventListener('animationend', () => item.remove());
+                }, i * 150);
+            }
+        };
+
+        const showLuckyNumber = () => {
+            playHorseSound(); 
+            const luckyNum = Math.floor(1000 + Math.random() * 8999);
+            const container = document.createElement('div');
+            container.className = 'lucky-number-display';
+            container.innerHTML = `
+                <div class="text-yellow-400 text-xl font-black mb-2 drop-shadow-md">🎉 今日发财号码 🎉</div>
+                <div class="text-white text-6xl md:text-7xl font-black italic tracking-tighter" style="text-shadow: 0 0 15px #fbbf24, 4px 4px 0px #450a0a;">
+                    ${luckyNum}
+                </div>
+            `;
+            document.body.appendChild(container);
+            container.addEventListener('animationend', () => container.remove());
+        };
+
+        uploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    villainImage.src = e.target.result;
+                    hasUploaded = true;
+                    hitCount = 0;
+                    counter.innerText = '0';
+                    printsLayer.innerHTML = '';
+                    document.getElementById('image-overlay-hint').classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        resetButton.addEventListener('click', () => {
+            hitCount = 0;
+            counter.innerText = '0';
+            villainImage.src = defaultVillainSrc;
+            hasUploaded = false;
+            printsLayer.innerHTML = '';
+            document.getElementById('image-overlay-hint').classList.remove('hidden');
+        });
+
+        window.addEventListener('mousedown', handleHit);
+        window.addEventListener('touchstart', (e) => {
+            handleHit(e);
+        }, { passive: true });
+    </script>
+</body>
+</html>
