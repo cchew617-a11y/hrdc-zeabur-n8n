@@ -32,6 +32,50 @@
             color: white !important;
             padding: 8px 16px;
         }
+        /* Custom styles for Retell button/status to fit your theme */
+        #retell-widget-container {
+            margin-top: 2rem;
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #fcfbf9; /* Lighter background to stand out slightly */
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Softer shadow */
+            max-width: 450px; /* Adjust as needed */
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid #e0d9cc; /* Subtle border */
+        }
+        #startCallButton {
+            background-color: #7b5b3a; /* Match your active nav color or choose suitable */
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px; /* Slightly more rounded */
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-transform: uppercase;
+            font-weight: 700; /* Bolder */
+            letter-spacing: 0.08em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Button shadow */
+        }
+        #startCallButton:hover {
+            background-color: #6a4f32;
+            transform: translateY(-1px); /* Slight lift effect */
+        }
+        #startCallButton:active {
+            transform: translateY(1px); /* Press effect */
+        }
+        #status {
+            margin-top: 1.25rem;
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
+        }
+        #status.error {
+            color: #dc2626; /* Red for errors */
+            font-weight: bold;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -75,7 +119,7 @@
 
     <!-- Main Section -->
     <main class="max-w-6xl mx-auto p-6 md:p-12">
-        <div class="flex justify-center">
+        <div class="flex justify-center flex-col items-center"> <!-- Added flex-col and items-center -->
             <!-- Brochure/Menu Card -->
             <div class="bg-[#e5dfd5] w-full max-w-2xl shadow-lg p-8 md:p-12 flex flex-col items-center">
                 
@@ -117,6 +161,14 @@
                     </p>
                 </div>
 
+                <!-- NEW: Retell Widget Container - Placed in main content area -->
+                <!-- Added custom styling to blend with your template -->
+                <div id="retell-widget-container" class="w-full">
+                    <p class="text-base text-gray-700 mb-4">Need to book a table? Speak to our AI assistant!</p>
+                    <button id="startCallButton">Start Reservation Call</button>
+                    <p id="status">Click the button to connect to our AI assistant.</p>
+                </div>
+                
                 <!-- Footer Line -->
                 <div class="w-full mt-10">
                     <hr class="border-gray-400">
@@ -129,225 +181,143 @@
         &copy; 2025 Chateau de C.A.F.F.E.I.N.E.E.S.
     </footer>
 
+    <!-- Retell Web SDK -->
+    <!-- Corrected to use specific version and type="module" -->
+    <script type="module" src="https://unpkg.com/retell-sdk@1.0.12"></script> 
 
-<script type="module" src="https://unpkg.com/retell-sdk@latest"></script>
-<script>
-    // --- IMPORTANT: REPLACE WITH YOUR ACTUAL RETELL IDs ---
-    const RETELL_PROJECT_ID = "YOUR_RETELL_PROJECT_ID";
-    const RETELL_AGENT_ID = "YOUR_RETELL_AGENT_ID";
-    // ---------------------------------------------------
+    <!-- Your custom script for button interaction -->
+    <!-- Corrected to use type="module" and pre-filled IDs, with more robust checks -->
+    <script type="module">
+        // --- IMPORTANT: YOUR ACTUAL RETELL IDs ---
+        // Your Workspace ID: org_KjCCCWCQL3V7Hqcp
+        // Your Agent ID for "Restaurant Reservation Assistant": agent_a1ccb172ffb615eb075cdf828f
+        const RETELL_PROJECT_ID = "org_KjCCCWCQL3V7Hqcp"; 
+        const RETELL_AGENT_ID = "agent_a1ccb172ffb615eb075cdf828f";
+        // ---------------------------------------------------
 
-    const startCallButton = document.getElementById("startCallButton");
-    const statusText = document.getElementById("status");
-    let isCalling = false;
-    let audioContext;
-    let audioInput;
-
-    // Function to start the conversation
-    async function startConversation() {
-        if (!RETELL_PROJECT_ID || RETELL_PROJECT_ID === "org_KJcCCWcQL3V7Hqcp" ||
-            !RETELL_AGENT_ID || RETELL_AGENT_ID === "agent_a1ccb172ffb615eb075cdf828f") {
-            statusText.textContent = "Error: Retell Project ID or Agent ID not configured. Please check the code.";
-            statusText.classList.add("error");
-            return;
-        }
-
-        statusText.textContent = "Connecting to AI assistant...";
-        statusText.classList.remove("error");
-        try {
-            // Initialize Retell SDK and start conversation
-            await window.retellSDK.startConversation({
-                projectId: RETELL_PROJECT_ID,
-                agentId: RETELL_AGENT_ID,
-                audioWeb: true, // Use Web Audio API for browser microphone/speaker
-                mic: true       // Request microphone access
-            });
-            isCalling = true;
-            startCallButton.textContent = "End Reservation Call";
-            statusText.textContent = "Connected! You can now speak to the AI.";
-        } catch (error) {
-            console.error("Error starting Retell conversation:", error);
-            statusText.textContent = "Failed to connect. Please try again. Check console for details.";
-            statusText.classList.add("error");
-            isCalling = false;
-            startCallButton.textContent = "Start Reservation Call";
-        }
-    }
-
-    // Function to stop the conversation
-    function stopConversation() {
-        if (window.retellSDK && isCalling) {
-            window.retellSDK.stopConversation();
-        }
-        isCalling = false;
-        startCallButton.textContent = "Start Reservation Call";
-        statusText.textContent = "Call ended.";
-        statusText.classList.remove("error");
-    }
-
-    // Event listener for the button
-    startCallButton.onclick = async () => {
-        if (isCalling) {
-            stopConversation();
-        } else {
-            startConversation();
-        }
-    };
-
-    // Optional: Handle Retell SDK events for better UI feedback
-    window.retellSDK.on("conversation_started", () => {
-        console.log("Retell: Conversation started!");
-        statusText.textContent = "Connected! You can now speak to the AI.";
-        statusText.classList.remove("error");
-    });
-
-    window.retellSDK.on("conversation_ended", () => {
-        console.log("Retell: Conversation ended!");
-        stopConversation(); // Ensure UI updates if call ends externally
-    });
-
-    window.retellSDK.on("error", (error) => {
-        console.error("Retell SDK error:", error);
-        statusText.textContent = `An error occurred: ${error.message || error}. Please try again.`;
-        statusText.classList.add("error");
-        isCalling = false;
-        startCallButton.textContent = "Start Reservation Call";
-    });
-
-    // Add a check for microphone permissions (good practice)
-    async function checkMicPermission() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            stream.getTracks().forEach(track => track.stop()); // Stop immediately
-            console.log("Microphone access granted.");
-        } catch (err) {
-            console.warn("Microphone access denied or not granted yet.", err);
-            statusText.textContent = "Please allow microphone access to use the voice assistant.";
-            statusText.classList.add("error");
-        }
-    }
-    // checkMicPermission(); // Uncomment if you want to check on page load
-</script>
-
-
-<!-- Retell Web SDK -->
-<script type="module" src="https://unpkg.com/retell-sdk@latest"></script>
-
-<!-- Your custom script for button interaction -->
-<script type="module">
-    // --- IMPORTANT: REPLACE WITH YOUR ACTUAL RETELL IDs ---
-    const RETELL_PROJECT_ID = "YOUR_RETELL_PROJECT_ID";
-    const RETELL_AGENT_ID = "YOUR_RETELL_AGENT_ID";
-    // ---------------------------------------------------
-
-    const startCallButton = document.getElementById("startCallButton");
-    const statusText = document.getElementById("status");
-    let isCalling = false;
-    let audioContext;
-    let audioInput;
-
-    // Ensure window.retellSDK is available
-    if (!window.retellSDK) {
-        console.error("Retell SDK not loaded correctly.");
-        statusText.textContent = "Error: Retell SDK failed to load. Please check console.";
-        statusText.classList.add("error");
-        // Prevent further execution if SDK isn't there
-        if (startCallButton) startCallButton.disabled = true;
-    }
-
-
-    // Function to start the conversation
-    async function startConversation() {
-        // ... (rest of your startConversation function remains the same) ...
-        if (!RETELL_PROJECT_ID || RETELL_PROJECT_ID === "YOUR_RETELL_PROJECT_ID" ||
-            !RETELL_AGENT_ID || RETELL_AGENT_ID === "YOUR_RETELL_AGENT_ID") {
-            statusText.textContent = "Error: Retell Project ID or Agent ID not configured. Please check the code.";
-            statusText.classList.add("error");
-            return;
-        }
-
-        statusText.textContent = "Connecting to AI assistant...";
-        statusText.classList.remove("error");
-        try {
-            await window.retellSDK.startConversation({
-                projectId: RETELL_PROJECT_ID,
-                agentId: RETELL_AGENT_ID,
-                audioWeb: true,
-                mic: true
-            });
-            isCalling = true;
-            startCallButton.textContent = "End Reservation Call";
-            statusText.textContent = "Connected! You can now speak to the AI.";
-        } catch (error) {
-            console.error("Error starting Retell conversation:", error);
-            statusText.textContent = "Failed to connect. Please try again. Check console for details.";
-            statusText.classList.add("error");
-            isCalling = false;
-            startCallButton.textContent = "Start Reservation Call";
-        }
-    }
-
-    // Function to stop the conversation
-    function stopConversation() {
-        if (window.retellSDK && isCalling) {
-            window.retellSDK.stopConversation();
-        }
-        isCalling = false;
-        startCallButton.textContent = "Start Reservation Call";
-        statusText.textContent = "Call ended.";
-        statusText.classList.remove("error");
-    }
-
-    // Event listener for the button
-    if (startCallButton) { // Ensure button exists before adding listener
-        startCallButton.onclick = async () => {
-            if (isCalling) {
-                stopConversation();
-            } else {
-                startConversation();
-            }
-        };
-    }
-
-
-    // Optional: Handle Retell SDK events for better UI feedback
-    // Check if window.retellSDK is available before trying to add event listeners
-    if (window.retellSDK) {
-        window.retellSDK.on("conversation_started", () => {
-            console.log("Retell: Conversation started!");
-            statusText.textContent = "Connected! You can now speak to the AI.";
-            statusText.classList.remove("error");
-        });
-
-        window.retellSDK.on("conversation_ended", () => {
-            console.log("Retell: Conversation ended!");
-            stopConversation();
-        });
-
-        window.retellSDK.on("error", (error) => {
-            console.error("Retell SDK error:", error);
-            statusText.textContent = `An error occurred: ${error.message || error}. Please try again.`;
-            statusText.classList.add("error");
-            isCalling = false;
-            startCallButton.textContent = "Start Reservation Call";
-        });
-    }
-
-    // Add a check for microphone permissions (good practice)
-    async function checkMicPermission() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            stream.getTracks().forEach(track => track.stop());
-            console.log("Microphone access granted.");
-        } catch (err) {
-            console.warn("Microphone access denied or not granted yet.", err);
-            if (statusText) {
-                statusText.textContent = "Please allow microphone access to use the voice assistant.";
+        const startCallButton = document.getElementById("startCallButton");
+        const statusText = document.getElementById("status");
+        let isCalling = false;
+        
+        // Initial checks for elements and SDK loading
+        if (startCallButton && statusText) { // Ensure elements exist
+            if (!window.retellSDK) {
+                console.error("Retell SDK object (window.retellSDK) not found. Check module import and network.");
+                statusText.textContent = "Error: Retell SDK failed to load. Please check console and network tab.";
                 statusText.classList.add("error");
+                startCallButton.disabled = true; // Disable button if SDK fails to load
+            }
+        } else {
+            console.error("HTML elements with IDs 'startCallButton' or 'status' were not found in the DOM.");
+            // We can't update statusText if it's null, so just log the error here.
+            // Further calls to statusText.textContent will be guarded.
+        }
+
+        // Function to start the conversation
+        async function startConversation() {
+            // Basic check for IDs, though they are now hardcoded
+            if (!RETELL_PROJECT_ID || !RETELL_AGENT_ID || 
+                RETELL_PROJECT_ID === "YOUR_RETELL_PROJECT_ID" || RETELL_AGENT_ID === "YOUR_RETELL_AGENT_ID") {
+                if (statusText) {
+                    statusText.textContent = "Error: Retell Project ID or Agent ID not properly configured in the script.";
+                    statusText.classList.add("error");
+                }
+                return;
+            }
+
+            if (statusText) {
+                statusText.textContent = "Connecting to AI assistant...";
+                statusText.classList.remove("error");
+            }
+            
+            try {
+                await window.retellSDK.startConversation({
+                    projectId: RETELL_PROJECT_ID,
+                    agentId: RETELL_AGENT_ID,
+                    audioWeb: true, // Use Web Audio API for browser microphone/speaker
+                    mic: true       // Request microphone access
+                });
+                isCalling = true;
+                if (startCallButton) startCallButton.textContent = "End Reservation Call";
+                if (statusText) statusText.textContent = "Connected! You can now speak to the AI.";
+            } catch (error) {
+                console.error("Error starting Retell conversation:", error);
+                if (statusText) {
+                    statusText.textContent = `Failed to connect: ${error.message || 'Unknown error'}. Please try again.`;
+                    statusText.classList.add("error");
+                }
+                isCalling = false;
+                if (startCallButton) startCallButton.textContent = "Start Reservation Call";
             }
         }
-    }
-</script>
-    
+
+        // Function to stop the conversation
+        function stopConversation() {
+            if (window.retellSDK && isCalling) {
+                window.retellSDK.stopConversation();
+            }
+            isCalling = false;
+            if (startCallButton) startCallButton.textContent = "Start Reservation Call";
+            if (statusText) {
+                statusText.textContent = "Call ended.";
+                statusText.classList.remove("error");
+            }
+        }
+
+        // Event listener for the button
+        if (startCallButton) { // Ensure button exists before adding listener
+            startCallButton.onclick = async () => {
+                if (isCalling) {
+                    stopConversation();
+                } else {
+                    startConversation();
+                }
+            };
+        }
+
+
+        // Optional: Handle Retell SDK events for better UI feedback
+        if (window.retellSDK) { // Check if window.retellSDK is available
+            window.retellSDK.on("conversation_started", () => {
+                console.log("Retell: Conversation started!");
+                if (statusText) {
+                    statusText.textContent = "Connected! You can now speak to the AI.";
+                    statusText.classList.remove("error");
+                }
+            });
+
+            window.retellSDK.on("conversation_ended", () => {
+                console.log("Retell: Conversation ended!");
+                stopConversation();
+            });
+
+            window.retellSDK.on("error", (error) => {
+                console.error("Retell SDK event error:", error);
+                if (statusText) {
+                    statusText.textContent = `An error occurred during call: ${error.message || 'Unknown error'}. Please try again.`;
+                    statusText.classList.add("error");
+                }
+                isCalling = false;
+                if (startCallButton) startCallButton.textContent = "Start Reservation Call";
+            });
+        }
+
+        // Add a check for microphone permissions (good practice)
+        async function checkMicPermission() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop()); // Stop immediately
+                console.log("Microphone access granted.");
+            } catch (err) {
+                console.warn("Microphone access denied or not granted yet.", err);
+                if (statusText) {
+                    statusText.textContent = "Please allow microphone access to use the voice assistant.";
+                    statusText.classList.add("error");
+                }
+            }
+        }
+        // Uncomment the line below if you want to check mic permission immediately on page load
+        // checkMicPermission(); 
+    </script>
 </body>
 </html>
