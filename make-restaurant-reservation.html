@@ -168,10 +168,8 @@
     </footer>
 
     <script type="module">
-        // 1. Import the Retell Web Client directly using an ES Module CDN
         import { RetellWebClient } from "https://esm.sh/retell-client-js-sdk";
 
-        // 2. Instantiate the client
         const retellSDK = new RetellWebClient();
 
         // --- IMPORTANT: YOUR ACTUAL RETELL IDs ---
@@ -183,16 +181,15 @@
         const statusText = document.getElementById("status");
         let isCalling = false;
 
-        // Function to start the conversation
-        async function startConversation() {
+        async function startCall() {
             if (statusText) {
                 statusText.textContent = "Connecting to AI assistant...";
                 statusText.classList.remove("error");
             }
             
             try {
-                // Trigger the call via the instantiated SDK
-                await retellSDK.startConversation({
+                // Changed from startConversation to startCall
+                await retellSDK.startCall({
                     projectId: RETELL_PROJECT_ID,
                     agentId: RETELL_AGENT_ID,
                     audioWeb: true, 
@@ -203,7 +200,7 @@
                 if (startCallButton) startCallButton.textContent = "End Reservation Call";
                 if (statusText) statusText.textContent = "Connected! You can now speak to the AI.";
             } catch (error) {
-                console.error("Error starting Retell conversation:", error);
+                console.error("Error starting Retell call:", error);
                 if (statusText) {
                     statusText.textContent = `Failed to connect: ${error.message || 'Unknown error'}. Please check console.`;
                     statusText.classList.add("error");
@@ -212,6 +209,55 @@
                 if (startCallButton) startCallButton.textContent = "Start Reservation Call";
             }
         }
+
+        function stopCall() {
+            if (isCalling) {
+                // Changed from stopConversation to stopCall
+                retellSDK.stopCall();
+            }
+            isCalling = false;
+            if (startCallButton) startCallButton.textContent = "Start Reservation Call";
+            if (statusText) {
+                statusText.textContent = "Call ended.";
+                statusText.classList.remove("error");
+            }
+        }
+
+        if (startCallButton) {
+            startCallButton.onclick = async () => {
+                if (isCalling) {
+                    stopCall();
+                } else {
+                    startCall();
+                }
+            };
+        }
+
+        // Changed event name to call_started
+        retellSDK.on("call_started", () => {
+            console.log("Retell: Call started!");
+            if (statusText) {
+                statusText.textContent = "Connected! You can now speak to the AI.";
+                statusText.classList.remove("error");
+            }
+        });
+
+        // Changed event name to call_ended
+        retellSDK.on("call_ended", () => {
+            console.log("Retell: Call ended!");
+            stopCall();
+        });
+
+        retellSDK.on("error", (error) => {
+            console.error("Retell SDK event error:", error);
+            if (statusText) {
+                statusText.textContent = `An error occurred during call: ${error.message || 'Unknown error'}.`;
+                statusText.classList.add("error");
+            }
+            isCalling = false;
+            if (startCallButton) startCallButton.textContent = "Start Reservation Call";
+        });
+    </script>
 
         // Function to stop the conversation
         function stopConversation() {
