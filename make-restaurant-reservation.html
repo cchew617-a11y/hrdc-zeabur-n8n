@@ -182,7 +182,7 @@
     </footer>
 
     <!-- Retell Web SDK - Now using the more stable UMD build from unpkg and NOT type="module" -->
-    <script src="https://unpkg.com/@retell-ai/client-sdk"></script> 
+    <script src="https://unpkg.com/retell-sdk@latest/dist/umd/index.js"></script>
 
     <!-- Your custom script for button interaction - Also NOT type="module" -->
     <script>
@@ -200,56 +200,42 @@
         // Initial checks for elements and SDK loading
         // Removed the window.retellSDK check here, as it might be undefined for a split second even if loading fine
         // Errors will be caught in the try/catch of startConversation
-        if (!startCallButton || !statusText) { 
-            console.error("HTML elements with IDs 'startCallButton' or 'status' were not found in the DOM.");
-            // If button is null, we can't add an onclick listener later, so exit gracefully
-            // Status text can't be updated if it's null either.
-        }
-
-
-        // Function to start the conversation
         async function startConversation() {
-    // ... (existing code for ID checks) ...
-
-    if (statusText) {
-        statusText.textContent = "Connecting to AI assistant...";
-        statusText.classList.remove("error");
-    }
-
-    try {
-        // --- NEW: Add a loop to wait for window.retellSDK to be defined ---
-        let retellSDKLoaded = false;
-        for (let i = 0; i < 20; i++) { // Try up to 20 times (2 seconds total)
-            if (window.retellSDK) {
-                retellSDKLoaded = true;
-                break;
+            // Basic check for IDs, though they are now hardcoded
+            if (!RETELL_PROJECT_ID || !RETELL_AGENT_ID || 
+                RETELL_PROJECT_ID === "YOUR_RETELL_PROJECT_ID" || RETELL_AGENT_ID === "YOUR_RETELL_AGENT_ID") {
+                if (statusText) {
+                    statusText.textContent = "Error: Retell Project ID or Agent ID not properly configured in the script.";
+                    statusText.classList.add("error");
+                }
+                return;
             }
-            await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms
-        }
-        if (!retellSDKLoaded) {
-            throw new Error("Retell SDK (window.retellSDK) failed to load after multiple attempts. Check network/loading.");
-        }
-        // --- END NEW ---
 
-        await window.retellSDK.startConversation({
-            projectId: RETELL_PROJECT_ID,
-            agentId: RETELL_AGENT_ID,
-            audioWeb: true,
-            mic: true
-        });
-        isCalling = true;
-        if (startCallButton) startCallButton.textContent = "End Reservation Call";
-        if (statusText) statusText.textContent = "Connected! You can now speak to the AI.";
-    } catch (error) {
-        console.error("Error starting Retell conversation:", error);
-        if (statusText) {
-            statusText.textContent = `Failed to connect: ${error.message || 'Unknown error'}. Please try again.`;
-            statusText.classList.add("error");
+            if (statusText) {
+                statusText.textContent = "Connecting to AI assistant...";
+                statusText.classList.remove("error");
+            }
+            
+            try {
+                await window.retellSDK.startConversation({
+                    projectId: RETELL_PROJECT_ID,
+                    agentId: RETELL_AGENT_ID,
+                    audioWeb: true, // Use Web Audio API for browser microphone/speaker
+                    mic: true       // Request microphone access
+                });
+                isCalling = true;
+                if (startCallButton) startCallButton.textContent = "End Reservation Call";
+                if (statusText) statusText.textContent = "Connected! You can now speak to the AI.";
+            } catch (error) {
+                console.error("Error starting Retell conversation:", error);
+                if (statusText) {
+                    statusText.textContent = `Failed to connect: ${error.message || 'Unknown error'}. Please try again.`;
+                    statusText.classList.add("error");
+                }
+                isCalling = false;
+                if (startCallButton) startCallButton.textContent = "Start Reservation Call";
+            }
         }
-        isCalling = false;
-        if (startCallButton) startCallButton.textContent = "Start Reservation Call";
-    }
-}
         // Function to stop the conversation
         function stopConversation() {
             if (window.retellSDK && isCalling) {
