@@ -181,13 +181,11 @@
         &copy; 2025 Chateau de C.A.F.F.E.I.N.E.E.S.
     </footer>
 
-    <!-- Retell Web SDK -->
-    <!-- Corrected to use specific version and type="module" -->
-    <script type="module" src="https://assets.retellai.com/retell-sdk.js"></script>
+    <!-- Retell Web SDK - Now using the more stable UMD build from unpkg and NOT type="module" -->
+    <script src="https://unpkg.com/@retell-ai/client-sdk"></script> 
 
-    <!-- Your custom script for button interaction -->
-    <!-- Corrected to use type="module" and pre-filled IDs, with more robust checks -->
-    <script type="module">
+    <!-- Your custom script for button interaction - Also NOT type="module" -->
+    <script>
         // --- IMPORTANT: YOUR ACTUAL RETELL IDs ---
         // Your Workspace ID: org_KjCCCWCQL3V7Hqcp
         // Your Agent ID for "Restaurant Reservation Assistant": agent_a1ccb172ffb615eb075cdf828f
@@ -200,18 +198,14 @@
         let isCalling = false;
         
         // Initial checks for elements and SDK loading
-        if (startCallButton && statusText) { // Ensure elements exist
-            if (!window.retellSDK) {
-                console.error("Retell SDK object (window.retellSDK) not found. Check module import and network.");
-                statusText.textContent = "Error: Retell SDK failed to load. Please check console and network tab.";
-                statusText.classList.add("error");
-                startCallButton.disabled = true; // Disable button if SDK fails to load
-            }
-        } else {
+        // Removed the window.retellSDK check here, as it might be undefined for a split second even if loading fine
+        // Errors will be caught in the try/catch of startConversation
+        if (!startCallButton || !statusText) { 
             console.error("HTML elements with IDs 'startCallButton' or 'status' were not found in the DOM.");
-            // We can't update statusText if it's null, so just log the error here.
-            // Further calls to statusText.textContent will be guarded.
+            // If button is null, we can't add an onclick listener later, so exit gracefully
+            // Status text can't be updated if it's null either.
         }
+
 
         // Function to start the conversation
         async function startConversation() {
@@ -231,6 +225,11 @@
             }
             
             try {
+                // Ensure Retell SDK is available before calling it
+                if (!window.retellSDK) {
+                    throw new Error("Retell SDK (window.retellSDK) is not available. Check network/loading.");
+                }
+
                 await window.retellSDK.startConversation({
                     projectId: RETELL_PROJECT_ID,
                     agentId: RETELL_AGENT_ID,
@@ -277,7 +276,8 @@
 
 
         // Optional: Handle Retell SDK events for better UI feedback
-        if (window.retellSDK) { // Check if window.retellSDK is available
+        // Check for window.retellSDK presence just before adding listeners
+        if (window.retellSDK) { 
             window.retellSDK.on("conversation_started", () => {
                 console.log("Retell: Conversation started!");
                 if (statusText) {
