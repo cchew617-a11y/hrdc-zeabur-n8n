@@ -7,75 +7,33 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            color: #333;
-            background-color: #ffffff;
-        }
-        h1, h2, .serif-font {
-            font-family: 'Playfair Display', serif;
-        }
-        .letter-spacing-wide {
-            letter-spacing: 0.25em;
-        }
-        .nav-link {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #555;
-            transition: color 0.3s;
-        }
-        .nav-link:hover {
-            color: #000;
-        }
-        .active-nav {
-            background-color: #7b5b3a;
-            color: white !important;
-            padding: 8px 16px;
-        }
-        /* Custom styles for Retell button/status to fit your theme */
+        body { font-family: 'Montserrat', sans-serif; color: #333; background-color: #ffffff; }
+        h1, h2, .serif-font { font-family: 'Playfair Display', serif; }
+        .letter-spacing-wide { letter-spacing: 0.25em; }
+        .nav-link { font-size: 0.75rem; font-weight: 600; color: #555; transition: color 0.3s; }
+        .nav-link:hover { color: #000; }
+        .active-nav { background-color: #7b5b3a; color: white !important; padding: 8px 16px; }
+        
+        /* Retell Widget Styles */
         #retell-widget-container {
-            margin-top: 2rem;
-            text-align: center;
-            padding: 1.5rem;
-            background-color: #fcfbf9; /* Lighter background to stand out slightly */
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Softer shadow */
-            max-width: 450px; /* Adjust as needed */
-            margin-left: auto;
-            margin-right: auto;
-            border: 1px solid #e0d9cc; /* Subtle border */
+            margin-top: 2rem; text-align: center; padding: 1.5rem;
+            background-color: #fcfbf9; border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            max-width: 450px; margin-left: auto; margin-right: auto;
+            border: 1px solid #e0d9cc;
         }
         #startCallButton {
-            background-color: #7b5b3a; /* Match your active nav color or choose suitable */
-            color: white;
-            padding: 14px 28px;
-            border: none;
-            border-radius: 8px; /* Slightly more rounded */
-            font-size: 1.05rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            text-transform: uppercase;
-            font-weight: 700; /* Bolder */
-            letter-spacing: 0.08em;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Button shadow */
+            background-color: #7b5b3a; color: white; padding: 14px 28px;
+            border: none; border-radius: 8px; font-size: 1.05rem;
+            cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease;
+            text-transform: uppercase; font-weight: 700; letter-spacing: 0.08em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        #startCallButton:hover {
-            background-color: #6a4f32;
-            transform: translateY(-1px); /* Slight lift effect */
-        }
-        #startCallButton:active {
-            transform: translateY(1px); /* Press effect */
-        }
-        #status {
-            margin-top: 1.25rem;
-            font-size: 0.95rem;
-            color: #555;
-            line-height: 1.5;
-        }
-        #status.error {
-            color: #dc2626; /* Red for errors */
-            font-weight: bold;
-        }
+        #startCallButton:hover { background-color: #6a4f32; transform: translateY(-1px); }
+        #startCallButton:active { transform: translateY(1px); }
+        #startCallButton:disabled { background-color: #ccc; cursor: not-allowed; }
+        #status { margin-top: 1.25rem; font-size: 0.95rem; color: #555; line-height: 1.5; }
+        #status.error { color: #dc2626; font-weight: bold; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -87,13 +45,11 @@
                 <text x="50" y="58" font-family="serif" font-size="20" text-anchor="middle" fill="currentColor">C</text>
             </svg>
         </div>
-        
         <div class="text-center">
             <p class="text-xs uppercase tracking-[0.3em] text-gray-500 mb-1">Chateau De</p>
             <h1 class="text-2xl md:text-3xl font-bold letter-spacing-wide text-gray-900">C.A.F.F.E.I.N.E.E.S.</h1>
             <p class="mt-4 font-bold text-xl tracking-widest text-red-600 uppercase">[THIS IS A DEMO WEBSITE]</p>
         </div>
-
         <nav class="mt-8 w-full max-w-4xl px-4">
             <ul class="flex flex-wrap justify-center items-center gap-4 md:gap-8 uppercase tracking-widest">
                 <li><a href="#" class="nav-link">Home</a></li>
@@ -101,7 +57,6 @@
                 <li><a href="#" class="active-nav nav-link">Menu</a></li>
                 <li><a href="#" class="nav-link">Events</a></li>
                 <li><a href="#" class="nav-link">Photo Gallery</a></li>
-                <li><a href="#" class="nav-link">Promotion</a></li>
                 <li><a href="#" class="nav-link">Contact Us</a></li>
             </ul>
         </nav>
@@ -115,41 +70,32 @@
     <main class="max-w-6xl mx-auto p-6 md:p-12">
         <div class="flex justify-center flex-col items-center">
             <div class="bg-[#e5dfd5] w-full max-w-2xl shadow-lg p-8 md:p-12 flex flex-col items-center">
-                
                 <div class="mb-2 scale-75">
                     <svg width="40" height="40" viewBox="0 0 100 100" class="fill-none stroke-current text-gray-700">
                         <path d="M50 5 L61 38 L95 38 L67 58 L78 91 L50 71 L22 91 L33 58 L5 38 L39 38 Z" stroke-width="2" />
                         <text x="50" y="58" font-family="serif" font-size="20" text-anchor="middle" fill="currentColor">C</text>
                     </svg>
                 </div>
-                
                 <div class="text-center mb-6">
                     <p class="text-[10px] uppercase tracking-[0.2em] text-gray-600">Chateau De</p>
                     <p class="text-xs font-bold tracking-[0.1em] text-gray-900">C.A.F.F.E.I.N.E.E.S. &trade;</p>
                 </div>
-
                 <div class="w-full flex items-center gap-4 mb-8">
                     <div class="flex-grow h-[1px] bg-gray-400"></div>
                     <h3 class="text-2xl md:text-3xl serif-font text-[#a18a68] uppercase tracking-[0.15em]">Café & Lounge</h3>
                     <div class="flex-grow h-[1px] bg-gray-400"></div>
                 </div>
-
                 <div class="w-full bg-white p-2 shadow-sm mb-8">
-                    <img 
-                        src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=1200" 
-                        alt="Restaurant Outdoor Seating" 
-                        class="w-full h-auto object-cover border border-gray-100"
-                        onerror="this.src='https://via.placeholder.com/800x500?text=Restaurant+View'"
-                    >
+                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=1200" alt="Restaurant Outdoor Seating" class="w-full h-auto object-cover border border-gray-100">
                 </div>
-
                 <div class="w-full text-left">
                     <h4 class="serif-font text-[#a18a68] text-lg mb-3">Chateau de C.A.F.F.E.I.N.E.E.S.</h4>
                     <p class="text-xs italic leading-relaxed text-gray-700 text-justify">
-                        Is a unique café restaurant that offers a fusion menu of authentic European cuisine in a romantic garden setting. The restaurant also offers fine coffees and a variety of wines imported from all over the world.
+                        Is a unique café restaurant that offers a fusion menu of authentic European cuisine in a romantic garden setting.
                     </p>
                 </div>
 
+                <!-- RETELL WIDGET AREA -->
                 <div id="retell-widget-container" class="w-full">
                     <p class="text-base text-gray-700 mb-4">Need to book a table? Speak to our AI assistant!</p>
                     <button id="startCallButton">Start Reservation Call</button>
@@ -167,15 +113,18 @@
         &copy; 2025 Chateau de C.A.F.F.E.I.N.E.E.S.
     </footer>
 
+    <!-- RETELL SCRIPT -->
     <script type="module">
         import { RetellWebClient } from "https://esm.sh/retell-client-js-sdk";
 
+        // Initialize the SDK
         const retellSDK = new RetellWebClient();
 
-        // --- IMPORTANT: YOUR ACTUAL RETELL IDs ---
-        const RETELL_PROJECT_ID = "org_KjCCCWCQL3V7Hqcp"; 
-        const RETELL_AGENT_ID = "agent_a1ccb172ffb615eb075cdf828f";
-        // ---------------------------------------------------
+        // -------------------------------------------------------------
+        // TODO: PASTE YOUR N8N WEBHOOK URL HERE
+        // This webhook must return JSON: { "access_token": "..." }
+        const YOUR_N8N_WEBHOOK_URL = "https://n8ncchew617.zeabur.app/webhook-test/make_restaurant_reservation"; 
+        // -------------------------------------------------------------
 
         const startCallButton = document.getElementById("startCallButton");
         const statusText = document.getElementById("status");
@@ -183,128 +132,74 @@
 
         async function startCall() {
             if (statusText) {
-                statusText.textContent = "Connecting to AI assistant...";
+                statusText.textContent = "Connecting...";
                 statusText.classList.remove("error");
             }
-            
+            startCallButton.disabled = true;
+
             try {
-                // Changed from startConversation to startCall
-                await retellSDK.startCall({
-                    projectId: RETELL_PROJECT_ID,
-                    agentId: RETELL_AGENT_ID,
-                    audioWeb: true, 
-                    mic: true       
+                // 1. Get the Access Token from your n8n Webhook
+                const response = await fetch(YOUR_N8N_WEBHOOK_URL, {
+                    method: 'POST', // or 'GET', depending on your n8n setup
+                    headers: { 'Content-Type': 'application/json' }
                 });
+
+                if (!response.ok) throw new Error("Failed to talk to n8n Webhook");
                 
+                const data = await response.json();
+                
+                // Expecting n8n to return { "access_token": "your_token_here" }
+                if (!data.access_token) throw new Error("Webhook did not return an access_token");
+
+                // 2. Start the call with the token
+                await retellSDK.startCall({
+                    accessToken: data.access_token
+                });
+
                 isCalling = true;
-                if (startCallButton) startCallButton.textContent = "End Reservation Call";
-                if (statusText) statusText.textContent = "Connected! You can now speak to the AI.";
+                startCallButton.textContent = "End Reservation Call";
+                startCallButton.disabled = false;
+                statusText.textContent = "Connected! Speak now.";
+
             } catch (error) {
-                console.error("Error starting Retell call:", error);
-                if (statusText) {
-                    statusText.textContent = `Failed to connect: ${error.message || 'Unknown error'}. Please check console.`;
-                    statusText.classList.add("error");
-                }
+                console.error("Error:", error);
+                statusText.textContent = `Error: ${error.message}`;
+                statusText.classList.add("error");
+                startCallButton.disabled = false;
                 isCalling = false;
-                if (startCallButton) startCallButton.textContent = "Start Reservation Call";
             }
         }
 
         function stopCall() {
-            if (isCalling) {
-                // Changed from stopConversation to stopCall
-                retellSDK.stopCall();
-            }
+            retellSDK.stopCall();
             isCalling = false;
-            if (startCallButton) startCallButton.textContent = "Start Reservation Call";
-            if (statusText) {
-                statusText.textContent = "Call ended.";
-                statusText.classList.remove("error");
+            startCallButton.textContent = "Start Reservation Call";
+            statusText.textContent = "Call ended.";
+        }
+
+        startCallButton.onclick = () => {
+            if (isCalling) {
+                stopCall();
+            } else {
+                startCall();
             }
-        }
+        };
 
-        if (startCallButton) {
-            startCallButton.onclick = async () => {
-                if (isCalling) {
-                    stopCall();
-                } else {
-                    startCall();
-                }
-            };
-        }
-
-        // Changed event name to call_started
+        // SDK Event Listeners
         retellSDK.on("call_started", () => {
-            console.log("Retell: Call started!");
-            if (statusText) {
-                statusText.textContent = "Connected! You can now speak to the AI.";
-                statusText.classList.remove("error");
-            }
+            console.log("Call started");
         });
 
-        // Changed event name to call_ended
         retellSDK.on("call_ended", () => {
-            console.log("Retell: Call ended!");
+            console.log("Call ended");
             stopCall();
         });
 
         retellSDK.on("error", (error) => {
-            console.error("Retell SDK event error:", error);
-            if (statusText) {
-                statusText.textContent = `An error occurred during call: ${error.message || 'Unknown error'}.`;
-                statusText.classList.add("error");
-            }
-            isCalling = false;
-            if (startCallButton) startCallButton.textContent = "Start Reservation Call";
-        });
-    </script>
-
-        // Function to stop the conversation
-        function stopConversation() {
-            if (isCalling) {
-                retellSDK.stopConversation();
-            }
-            isCalling = false;
-            if (startCallButton) startCallButton.textContent = "Start Reservation Call";
-            if (statusText) {
-                statusText.textContent = "Call ended.";
-                statusText.classList.remove("error");
-            }
-        }
-
-        // Event listener for the button
-        if (startCallButton) {
-            startCallButton.onclick = async () => {
-                if (isCalling) {
-                    stopConversation();
-                } else {
-                    startConversation();
-                }
-            };
-        }
-
-        // Handle Retell SDK events
-        retellSDK.on("conversationStarted", () => {
-            console.log("Retell: Conversation started!");
-            if (statusText) {
-                statusText.textContent = "Connected! You can now speak to the AI.";
-                statusText.classList.remove("error");
-            }
-        });
-
-        retellSDK.on("conversationEnded", () => {
-            console.log("Retell: Conversation ended!");
-            stopConversation();
-        });
-
-        retellSDK.on("error", (error) => {
-            console.error("Retell SDK event error:", error);
-            if (statusText) {
-                statusText.textContent = `An error occurred during call: ${error.message || 'Unknown error'}.`;
-                statusText.classList.add("error");
-            }
-            isCalling = false;
-            if (startCallButton) startCallButton.textContent = "Start Reservation Call";
+            console.error("SDK Error:", error);
+            stopCall();
+            statusText.textContent = "Connection dropped.";
+            statusText.classList.add("error");
         });
     </script>
 </body>
