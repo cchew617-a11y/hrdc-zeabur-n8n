@@ -32,6 +32,8 @@
             border-radius: 50%;
             margin-bottom: 1rem;
             object-fit: cover;
+            
+            /* The Red Circle Effect */
             border: 5px solid #ff6b4a;
             padding: 4px;
             background-color: white;   
@@ -61,6 +63,7 @@
         }
 
         input[type="file"] { padding: 0.5rem; cursor: pointer; }
+        
         textarea { resize: vertical; min-height: 80px; }
 
         button {
@@ -79,31 +82,8 @@
             box-shadow: 0 2px 4px rgba(255, 107, 74, 0.2);
         }
         button:hover { background-color: #e55a3b; }
-        button:disabled { background-color: #fca5a5; cursor: not-allowed; }
         
-        /* --- STATUS MESSAGE STYLES --- */
-        #statusMessage {
-            display: none;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-align: left;
-        }
-        #statusMessage.success {
-            display: block;
-            background-color: #d1fae5;
-            color: #065f46;
-            border: 1px solid #34d399;
-        }
-        #statusMessage.error {
-            display: block;
-            background-color: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #f87171;
-        }
-
+        /* Updated Footer Email Style for Link */
         .footer-email { 
             font-weight: 700; 
             color: #111827; 
@@ -112,7 +92,9 @@
             font-size: 0.9rem;
             cursor: pointer;
         }
-        .footer-email:hover { color: #ff6b4a; }
+        .footer-email:hover {
+            color: #ff6b4a; /* Adds a hover effect color */
+        }
 
         .legal-box {
             background-color: #f9fafb;
@@ -130,6 +112,7 @@
 <body>
 
     <div class="card">
+        <!-- Logo Image -->
         <img src="jasonchew.aitrainerlogo.png" alt="Logo" class="logo">
         
         <h2>The Ultimate Receipt Scanner (lite version)</h2>
@@ -140,30 +123,35 @@
             *Note: Maximum number of receipts per day: 100 <br>
         </p>
 
-        <div id="statusMessage"></div>
-
-        <form id="receiptForm" action="https://n8ncchew617.zeabur.app/webhook-test/slv-demo-upload-receipt" method="POST" enctype="multipart/form-data">
+        <!-- FORM START -->
+        <form action="https://n8ncchew617.zeabur.app/webhook/slv-demo-upload-receipt" method="POST" enctype="multipart/form-data">
             
+            <!-- 1. Full Name -->
             <label for="full_name">Full Name*</label>
             <input type="text" id="full_name" name="full_name" placeholder="Enter Your Full Name" required>
 
+            <!-- 2. NRIC Number -->
             <label for="nric">NRIC Number</label>
             <input type="text" id="nric" name="nric" placeholder="e.g. 700102-14-XXXX">
 
+            <!-- 3. Mobile Phone -->
             <label for="phone">Mobile Phone  [e.g. +60121234567]</label>
             <input type="tel" id="phone" name="phone" placeholder="e.g. +60121234567">
 
+            <!-- 4. Receipt Image -->
             <label for="receipt_image">Upload Receipt Image* [e.g. .jpg,.png]</label>
             <input type="file" id="receipt_image" name="Receipt_Photo" accept=".jpg,.png" required>
             
+            <!-- 5. Description -->
             <label for="purpose">Receipt Description*</label>
             <textarea id="purpose" name="purpose" placeholder="receipt description e.g. lunch with client A, attaend XXX event & etc." required></textarea>
 
-            <button type="submit" id="submitBtn">Upload Receipt</button>
+            <button type="submit">Upload Receipt</button>
         </form>
 
         <div class="footer-section">
-            <a href="mailto:JasonChew.HRDCTrainer@gmail.com" class="footer-email" style="text-decoration: none;">JasonChew.HRDCTrainer@gmail.com</a>
+            <!-- Clickable Email Link -->
+            <a href="mailto:Jasonchew.HRDCtrainer@gmail.com" class="footer-email" style="text-decoration: none;">Jasonchew.HRDCtrainer@gmail.com</a>
             
             <div class="legal-box">
                 <strong>Legal Disclaimer:</strong> This demo tool is for educational purpose only. Users are <strong>solely responsible</strong> for ensuring that their use of this demo tool does not breach data privacy laws.
@@ -171,46 +159,5 @@
         </div>
     </div>
 
-    <script>
-        document.getElementById('receiptForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); // Stop the browser from navigating away
-            
-            const form = e.target;
-            const submitBtn = document.getElementById('submitBtn');
-            const statusBox = document.getElementById('statusMessage');
-            const originalBtnText = submitBtn.innerText;
-
-            // Set loading state
-            submitBtn.innerText = 'Uploading...';
-            submitBtn.disabled = true;
-            statusBox.className = '';
-            statusBox.innerHTML = '';
-
-            try {
-                const formData = new FormData(form);
-                
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    statusBox.innerHTML = '✅ Receipt successfully uploaded!';
-                    statusBox.className = 'success';
-                    form.reset(); // Clear the form after success
-                } else {
-                    statusBox.innerHTML = '❌ Upload failed. Please check the server connection.';
-                    statusBox.className = 'error';
-                }
-            } catch (error) {
-                statusBox.innerHTML = '❌ A network error occurred. Please try again.';
-                statusBox.className = 'error';
-            } finally {
-                // Reset button state
-                submitBtn.innerText = originalBtnText;
-                submitBtn.disabled = false;
-            }
-        });
-    </script>
 </body>
 </html>
