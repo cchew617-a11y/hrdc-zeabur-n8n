@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit CV - Beyond2U AI HR Expert [Demo]</title>
+    <title>Submit CV - Jason Chew's AI Classroom</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -24,14 +24,21 @@
             max-width: 420px;
             text-align: center;
         }
-        /* Updated Logo Styles */
         .logo {
-            max-width: 180px; /* Increased width for full-scale visibility */
-            height: auto;    /* Allow height to scale naturally */
+            max-width: 180px;
+            height: auto;
+            margin-bottom: 0.5rem; /* Reduced margin to keep tagline close */
+            object-fit: contain;
+            border-radius: 0;
+            border: none;
+        }
+        /* Tagline Style */
+        .tagline {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #000000;
             margin-bottom: 1.5rem;
-            object-fit: contain; /* Ensure the image is not cropped */
-            border-radius: 0;    /* Removed round confinement */
-            border: none;        /* Removed border for a cleaner look */
+            display: block;
         }
         h2 { margin: 0 0 0.5rem 0; color: #111827; font-size: 1.5rem; font-weight: 700; }
         h3 { margin: 0 0 0.5rem 0; color: #111827; font-weight: 700; font-size: 1.25rem; }
@@ -88,11 +95,13 @@
     <div class="card">
         <img src="Beyond2U_logo.png" alt="Beyond2U Logo" class="logo">
         
+        <span class="tagline">Your Choice of Worldwide Support</span>
+        
         <h2>Beyond2U AI HR Expert [DEMO]</h2>
         <h3>Candidate CV Sreening [v2]</h3>
         
         <p class="description">
-            Select job position and upload candidate CV to begin.
+            Select the position you are applying for and upload your CV to begin.
         </p>
 
         <form action="https://n8ncchew617.zeabur.app/webhook/submit-cv" method="POST" enctype="multipart/form-data">
