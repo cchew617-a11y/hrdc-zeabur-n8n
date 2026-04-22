@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit CV - Jason Chew's AI Classroom</title>
+    <title>Submit CV - Beyond2U AI HR Expert [Demo]</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -24,20 +24,20 @@
             max-width: 420px;
             text-align: center;
         }
+        /* Updated Logo Styles */
         .logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin-bottom: 1rem;
-            object-fit: cover;
-            border: 2px solid #e5e7eb;
+            max-width: 180px; /* Increased width for full-scale visibility */
+            height: auto;    /* Allow height to scale naturally */
+            margin-bottom: 1.5rem;
+            object-fit: contain; /* Ensure the image is not cropped */
+            border-radius: 0;    /* Removed round confinement */
+            border: none;        /* Removed border for a cleaner look */
         }
         h2 { margin: 0 0 0.5rem 0; color: #111827; font-size: 1.5rem; font-weight: 700; }
         h3 { margin: 0 0 0.5rem 0; color: #111827; font-weight: 700; font-size: 1.25rem; }
         .description { color: #6b7280; margin: 0 0 2rem 0; font-size: 0.95rem; line-height: 1.5; }
         label { display: block; text-align: left; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.9rem; }
         
-        /* Updated Styles for Select Dropdown */
         select, input[type="file"] {
             width: 100%;
             padding: 0.75rem;
@@ -86,21 +86,18 @@
 <body>
 
     <div class="card">
-        <img src="Beyond2U_logo.png" alt="Logo" class="logo">
+        <img src="Beyond2U_logo.png" alt="Beyond2U Logo" class="logo">
         
         <h2>Beyond2U AI HR Expert [DEMO]</h2>
         <h3>Candidate CV Sreening [v2]</h3>
         
         <p class="description">
-            Select the position you are applying for and upload your CV to begin.
+            Select job position and upload candidate CV to begin.
         </p>
 
-        <!-- Main Form (Submits to your Workflow) -->
-        <!-- Note: This URL must point to your SUBMIT-CV webhook (POST method) -->
         <form action="https://n8ncchew617.zeabur.app/webhook/submit-cv" method="POST" enctype="multipart/form-data">
             
             <label for="job_id">Select Position</label>
-            <!-- Dropdown List -->
             <select id="job_id" name="job_id" required>
                 <option value="" disabled selected>Loading jobs...</option>
             </select>
@@ -119,11 +116,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT TO FETCH JOBS -->
     <script>
-        // ---------------------------------------------------------
-        // CONFIGURATION: Points to the 'GET JOBS' Webhook (GET method)
-        // ---------------------------------------------------------
         const GET_JOBS_URL = "https://n8ncchew617.zeabur.app/webhook/get-jobs"; 
 
         async function loadJobs() {
@@ -132,34 +125,23 @@
                 const response = await fetch(GET_JOBS_URL);
                 const data = await response.json();
                 
-                // --- DEBUGGING: Open Console (F12) to see this ---
-                console.log("Data received from n8n:", data);
-                
-                // Check if n8n returned an error message
                 if (data.message) {
-                    console.error("n8n Error:", data.message);
                     dropdown.innerHTML = '<option value="" disabled>Error: ' + data.message + '</option>';
                     return;
                 }
 
-                // SAFETY: Ensure 'data' is a list. If it's a single object, wrap it in brackets [ ].
                 const jobList = Array.isArray(data) ? data : [data];
-
-                // Clear the "Loading..." text
                 dropdown.innerHTML = '<option value="" disabled selected>-- Select a Job --</option>';
 
-                // Loop through the data
                 jobList.forEach(row => {
-                    // Ensure we are reading the correct columns from your Google Sheet
                     const id = row["Job ID"];
                     const title = row["Job Position"]; 
-                    const company = row["Company Name"]; // Added Company Name
+                    const company = row["Company Name"];
 
                     if(id && title) {
                         const option = document.createElement("option");
                         option.value = id; 
                         
-                        // Display Format: JOB-001 - Company Name - Job Position
                         if (company) {
                             option.text = `${id} - ${company} - ${title}`; 
                         } else {
@@ -172,11 +154,10 @@
 
             } catch (error) {
                 console.error("Error fetching jobs:", error);
-                dropdown.innerHTML = '<option value="" disabled>Connection Failed (Check Console)</option>';
+                dropdown.innerHTML = '<option value="" disabled>Connection Failed</option>';
             }
         }
 
-        // Run the function when page opens
         loadJobs();
     </script>
 
