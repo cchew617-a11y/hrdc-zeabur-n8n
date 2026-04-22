@@ -27,12 +27,11 @@
         .logo {
             max-width: 180px;
             height: auto;
-            margin-bottom: 0.5rem; /* Reduced margin to keep tagline close */
+            margin-bottom: 0.5rem;
             object-fit: contain;
             border-radius: 0;
             border: none;
         }
-        /* Tagline Style */
         .tagline {
             font-size: 1.1rem;
             font-weight: 700;
@@ -76,7 +75,20 @@
         }
         button:hover { background-color: #e55a3b; }
         
-        .footer-email { font-weight: 700; color: #111827; margin-bottom: 0.75rem; display: block; font-size: 0.9rem; }
+        /* Updated Footer Email Link Style */
+        .footer-email { 
+            font-weight: 700; 
+            color: #111827; 
+            margin-bottom: 0.75rem; 
+            display: block; 
+            font-size: 0.9rem; 
+            text-decoration: none; /* Removes underline */
+        }
+        .footer-email:hover {
+            color: #ff6b4a; /* Matches button color on hover */
+            text-decoration: underline;
+        }
+
         .legal-box {
             background-color: #f9fafb;
             border: 1px solid #f3f4f6;
@@ -118,7 +130,8 @@
         </form>
 
         <div class="footer-section">
-            <span class="footer-email">jason.chew@beyond2u.com</span>
+            <a href="mailto:Jason.Chew@beyond2u.com" class="footer-email">Jason.Chew@beyond2u.com</a>
+            
             <div class="legal-box">
                 <strong>Legal Disclaimer:</strong> This tool is for Beyond2U internal usage only. Users are <strong>solely responsible</strong> for ensuring that their use of this automation does not breach data privacy laws.
             </div>
